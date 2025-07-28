@@ -1,0 +1,138 @@
+/* Reset styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  font-family: Georgia, sans-serif;
+  position: relative;
+}
+
+p { /* Add this to reset paragraph margins */
+  margin: 0;
+}
+
+/* Text Box Styles */
+.text-box {
+  background-color: rgba(209, 209, 209, 0.925);
+  color: rgb(0, 0, 0);
+  padding: 2rem; /* Increased padding for better spacing */
+  overflow-y: auto;
+  border-radius: 0.5rem; /* Soften the corners */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); /* Refined shadow */
+  max-height: calc(100vh - 200px); /* Adjusted max-height */
+  position: relative;
+  z-index: 1;
+  font-size: 1.125rem; /* 18px equivalent, adjust as needed */
+  line-height: 1.6; /* Improved line height for readability */
+  margin-bottom: 2rem; /* Increased spacing between text boxes */
+  max-width: 85%; /* More responsive max-width */
+}
+
+.secondary-text-box {
+  margin-top: 2rem;
+  max-height: 400px; /* Adjusted max-height */
+  margin-bottom: 2rem; /* Increased spacing between text boxes */
+  padding: 1.5rem; /* Consistent padding */
+  font-size: 1rem; /* Slightly smaller font size */
+  line-height: 1.5; /* Improved line height for readability */
+}
+
+/* Banner Styles */
+.banner {
+  width: 100%;
+  background-color: #000000;
+  color: white;
+  padding: 1rem 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  text-align: center;
+  font-size: 1.125rem; /* 18px equivalent, adjust as needed */
+  height: 50px;
+}
+
+/* Container Styles */
+.container {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 50px;
+}
+
+/* Mobile menu toggle button */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 10px;
+  z-index: 1001;
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .text-box {
+    font-size: 1rem; /* Adjust font size for smaller screens */
+    padding: 1.5rem; /* Adjust padding for smaller screens */
+    max-height: calc(100vh - 150px); /* Adjust max-height for smaller screens */
+    max-width: 100%; /* Take up more width on smaller screens */
+  }
+
+  .secondary-text-box {
+    font-size: 0.9rem; /* Adjust font size for smaller screens */
+    padding: 1rem; /* Adjust padding for smaller screens */
+  }
+}
+
+/* Small mobile styles */
+@media (max-width: 480px) {
+  .title {
+    font-size: 2rem;
+  }
+}
+
+/* iPad Styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .text-box {
+    font-size: 1.1rem; /* Adjust font size for iPads */
+    padding: 1.75rem; /* Adjust padding for iPads */
+    max-height: calc(100vh - 180px); /* Adjust max-height for iPads */
+    max-width: 100%; /* Take up more width on iPads */
+  }
+
+  .secondary-text-box {
+    font-size: 0.95rem; /* Adjust font size for iPads */
+    padding: 1.25rem; /* Adjust padding for iPads */
+  }
+}
+
+.bottom-image-style {
+  text-align: center;
+  margin: 15px auto; /* Add auto margins for centering */
+  display: block; /* Ensure it's a block-level element */
+  width: 90%; /* Take up the full width of the parent */
+}
+
+/* Page-specific background image */
+.page-background {
+  background-image: var(--page-background-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  height: 100%;
+}

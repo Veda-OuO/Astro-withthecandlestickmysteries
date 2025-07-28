@@ -1,0 +1,150 @@
+---
+// src/components/Sidebar.astro
+import { pages } from '../data/pages.js';
+---
+
+<div class="sidebar" id="sidebar">
+  <div class="counter">Investigative Hours: <span id="counter">0</span></div>
+  <div class="link-list" id="linkList">
+    {pages.map(item => {
+      if (item.type === 'category') {
+        return <div class="category">{item.title}</div>;
+      } else if (item.type === 'link') {
+        const classes = ['nav-link'];
+        if (item.special) classes.push('special');
+        if (item.special1) classes.push('special1');
+        if (item.initialLocked === true) classes.push('locked'); // Add 'locked' class
+
+        return (
+          <a
+            href={`/${item.filename}`}
+            class={classes.join(' ')}
+            data-filename={item.filename}
+            data-counted={item.counted !== false ? 'true' : 'false'}
+          >
+            {item.title}
+          </a>
+        );
+      }
+    })}
+  </div>
+</div>
+
+<style>
+  .sidebar {
+    width: 280px;
+    background-color: #111;
+    color: white;
+    padding: 10px;
+    overflow-y: auto;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    bottom: 0;
+    z-index: 999;
+  }
+
+  .counter {
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+    margin-bottom: 20px;
+    text-underline-offset: 2px;
+    background-color: #8B0000;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    border: 2px solid #ff6b6b;
+  }
+
+  .link-list a {
+    display: block;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid #444;
+    white-space: nowrap;
+  }
+
+  .link-list a:hover {
+    background-color: #333;
+  }
+
+  .category {
+    padding: 10px;
+    background-color: #e9b60ece;
+    color: #000000;
+    font-weight: bold;
+    border-bottom: 3px solid #d1a000;
+    margin-top: 10px;
+    text-shadow: 0 0 3px rgb(85, 85, 85);
+  }
+
+  .link-list a.visited {
+    background-color: #888888;
+    color: #000000;
+    text-decoration: solid;
+  }
+
+  .link-list a.special {
+    background-color: #002382;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 0 3px black;
+  }
+
+  .link-list a.special.locked {
+    background-color: #002382;
+    color: #ffffff;
+  }
+
+  .link-list a.special1 {
+    background-color: #7e0082;
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 0 3px black;
+  }
+
+  .link-list a.special1.locked {
+    background-color: #7e0082;
+    color: #ffffff;
+  }
+
+  .link-list a.locked {
+    background-color: #444;
+    color: #999;
+    position: relative;
+    pointer-events: none;
+  }
+
+  .link-icon {
+    color: #FFD700 !important;
+    font-size: 24px;
+    margin-left: 5px;
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    font-weight: bold;
+  }
+
+  /* Mobile styles */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 250px;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1002;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+  }
+
+  /* Small mobile styles */
+  @media (max-width: 480px) {
+    .sidebar {
+      width: 200px;
+    }
+  }
+</style>
