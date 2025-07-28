@@ -1,5 +1,5 @@
 ---
-// src/components/VisitTracker.astro
+// filepath: c:\Users\gregw\retrograde-meridian\src\components\VisitTracker.astro
 import { pages } from '../data/pages.js';
 
 export interface Props {
@@ -30,21 +30,29 @@ const { pageId } = Astro.props;
     whodunitUnlocked = localStorage.getItem("whodunitUnlocked") === "true";
     timeReachedZero = localStorage.getItem("timeReachedZero") === "true";
 
-    // Load initialLocked state from localStorage
-    pages.forEach(page => {
-      if (page.type === 'link') {
-        const lockedState = localStorage.getItem(`locked_${page.filename}`);
-        if (lockedState !== null) {
-          page.initialLocked = lockedState === "true";
+    if (Array.isArray(pages)) {
+      pages.forEach(page => {
+        if (page.type === 'link') {
+          const lockedState = localStorage.getItem(`locked_${page.filename}`);
+          if (lockedState !== null) {
+            page.initialLocked = lockedState === "true";
+          }
         }
-      }
-    });
+      });
+    } else {
+      console.error("Error: `pages` is not an array or is undefined.");
+    }
   } catch (e) {
     console.error("Error loading game state:", e);
     localStorage.removeItem("visitedPages");
   }
 
   function updateCounter() {
+    if (!Array.isArray(pages)) {
+      console.error("Error: `pages` is not an array or is undefined.");
+      return;
+    }
+
     const countedVisitedPages = [...visited].filter(filename => {
       const page = pages.find(p => p.filename === filename);
       return page && page.counted !== false;
@@ -56,6 +64,8 @@ const { pageId } = Astro.props;
     const counter = document.getElementById("counter");
     if (counter) {
       counter.textContent = remainingHours;
+    } else {
+      console.warn("Warning: `counter` element not found.");
     }
 
     const counterElement = counter?.parentElement;
@@ -69,7 +79,6 @@ const { pageId } = Astro.props;
       }
     }
 
-    // Check if time reached zero
     if (remainingHours === 0 && !timeReachedZero) {
       handleTimeReachedZero();
     }
@@ -83,15 +92,16 @@ const { pageId } = Astro.props;
     localStorage.setItem("timeReachedZero", "true");
     localStorage.setItem("examUnlocked", "true");
 
-    // Show modal
-    showFinalLeadModal();
+    try {
+      showFinalLeadModal();
+    } catch (e) {
+      console.error("Error showing final lead modal:", e);
+    }
 
-    // Update link states
     updateLinkStates();
   }
 
   function showFinalLeadModal() {
-    // Create modal overlay
     const modal = document.createElement('div');
     modal.style.cssText = `
       position: fixed;
@@ -106,7 +116,6 @@ const { pageId } = Astro.props;
       z-index: 10000;
     `;
 
-    // Create modal content
     const modalContent = document.createElement('div');
     modalContent.style.cssText = `
       background-color: #fff;
@@ -134,12 +143,10 @@ const { pageId } = Astro.props;
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
 
-    // Close modal handler
     document.getElementById('modalClose').addEventListener('click', () => {
       document.body.removeChild(modal);
     });
 
-    // Close on outside click
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         document.body.removeChild(modal);
@@ -156,7 +163,6 @@ const { pageId } = Astro.props;
   }
 
   function isLockableTab(filename) {
-    // Tabs that should never be locked
     const neverLock = ['notes', 'rules', 'intro', 'exam', 'whodunit'];
     return !neverLock.includes(filename);
   }
@@ -165,12 +171,10 @@ const { pageId } = Astro.props;
     const page = pages.find(p => p.filename === filename);
     if (!page) return false;
 
-    // Check initialLocked property
     if (page.initialLocked === true) {
       return true;
     }
 
-    // Special cases
     if (filename === 'exam') {
       return !examUnlocked;
     }
@@ -178,12 +182,10 @@ const { pageId } = Astro.props;
       return !whodunitUnlocked;
     }
 
-    // If time hasn't reached zero, no tabs are locked (except exam/whodunit)
     if (!timeReachedZero) {
       return false;
     }
 
-    // After time reaches zero, lock unvisited lockable tabs
     if (isLockableTab(filename) && !visited.has(filename)) {
       return true;
     }
@@ -192,30 +194,35 @@ const { pageId } = Astro.props;
   }
 
   function updateLinkStates() {
+    if (!Array.isArray(pages)) {
+      console.error("Error: `pages` is not an array or is undefined.");
+      return;
+    }
+
     const links = document.querySelectorAll('.nav-link');
+    if (links.length === 0) {
+      console.warn("Warning: No `.nav-link` elements found.");
+      return;
+    }
+
     links.forEach(link => {
       const filename = link.getAttribute('data-filename');
       if (!filename) return;
 
-      // Remove all lock-related classes
       link.classList.remove('visited', 'locked');
 
-      // Remove any existing lock icons
       const existingLock = link.querySelector('.lock-icon');
       if (existingLock) {
         existingLock.remove();
       }
 
-      // Apply visited style
       if (visited.has(filename)) {
         link.classList.add('visited');
       }
 
-      // Apply locked style if needed
       if (shouldTabBeLocked(filename)) {
         link.classList.add('locked');
 
-        // Add lock icon
         const lockIcon = document.createElement('span');
         lockIcon.className = 'lock-icon';
         lockIcon.innerHTML = ' 🔒';
@@ -225,126 +232,76 @@ const { pageId } = Astro.props;
     });
   }
 
-  function checkExamCompletion() {
-    // Listen for exam completion event
-    window.addEventListener('examCompleted', () => {
-      whodunitUnlocked = true;
-      localStorage.setItem("whodunitUnlocked", "true");
-      updateLinkStates();
-      console.log('Whodunit unlocked via exam completion');
-    });
-
-    // Also check localStorage periodically in case we're on a different page
-    if (examUnlocked && !whodunitUnlocked) {
-      const checkInterval = setInterval(() => {
-        const unlocked = localStorage.getItem("whodunitUnlocked") === "true";
-        if (unlocked && !whodunitUnlocked) {
-          whodunitUnlocked = true;
-          updateLinkStates();
-          clearInterval(checkInterval);
-        }
-      }, 1000);
-    }
-  }
-
   function showNotification(message) {
+    const mainElement = document.querySelector('.main');
+    if (!mainElement) {
+      console.warn("Warning: `.main` element not found. Notification not displayed.");
+      return;
+    }
+
     const notification = document.createElement('div');
-    notification.style.cssText = `
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      z-index: 9999;
-    `;
+    notification.className = 'notification';
     notification.textContent = message;
-    document.querySelector('.main').prepend(notification);
+    mainElement.prepend(notification);
 
     setTimeout(() => {
       notification.remove();
     }, 3000);
   }
 
-  // Mark current page as visited if not already
   if (pageId && !visited.has(pageId)) {
-    console.log(`Page ${pageId} visited`); // Debugging
     visited.add(pageId);
     saveVisitedPages();
 
-    // Handle unlocksOnVisit and locksOnVisit
     const currentPage = pages.find(p => p.filename === pageId);
     if (currentPage) {
-      console.log(`Current page found: ${currentPage.title}`); // Debugging
       let notificationMessage = '';
 
       if (currentPage.unlocksOnVisit) {
-        console.log(`Unlocking on visit: ${currentPage.unlocksOnVisit}`); // Debugging
         currentPage.unlocksOnVisit.forEach(filename => {
           const pageToUnlock = pages.find(p => p.filename === filename);
           if (pageToUnlock) {
-            console.log(`Page to unlock found: ${pageToUnlock.title}`); // Debugging
             pageToUnlock.initialLocked = false;
-            localStorage.setItem(`locked_${pageToUnlock.filename}`, "false"); // Save to localStorage
+            localStorage.setItem(`locked_${pageToUnlock.filename}`, "false");
             notificationMessage += `${pageToUnlock.title} unlocked. `;
-          } else {
-            console.log(`Page to unlock NOT found: ${filename}`); // Debugging
           }
         });
       }
 
       if (currentPage.locksOnVisit) {
-        console.log(`Locking on visit: ${currentPage.locksOnVisit}`); // Debugging
         currentPage.locksOnVisit.forEach(filename => {
           const pageToLock = pages.find(p => p.filename === filename);
           if (pageToLock) {
-            console.log(`Page to lock found: ${pageToLock.title}`); // Debugging
             pageToLock.initialLocked = true;
-            localStorage.setItem(`locked_${pageToLock.filename}`, "true"); // Save to localStorage
+            localStorage.setItem(`locked_${pageToLock.filename}`, "true");
             notificationMessage += `${pageToLock.title} locked. `;
-          } else {
-             console.log(`Page to lock NOT found: ${filename}`); // Debugging
           }
         });
       }
 
       if (notificationMessage) {
-        console.log(`Notification message: ${notificationMessage}`); // Debugging
         showNotification(notificationMessage);
-      } else {
-        console.log("No notification message"); // Debugging
       }
 
-      // Update link states after unlocking/locking
       updateLinkStates();
-    } else {
-      console.log(`Current page NOT found for pageId: ${pageId}`); // Debugging
     }
   }
 
-  // Update counter and link states on page load
   document.addEventListener('DOMContentLoaded', () => {
     updateCounter();
     updateLinkStates();
 
-    // Check exam completion if on exam page
     if (pageId === 'exam') {
       checkExamCompletion();
     }
 
-    // Handle navigation clicks
     const links = document.querySelectorAll('.nav-link');
     links.forEach(link => {
       link.addEventListener('click', (e) => {
         const filename = link.getAttribute('data-filename');
 
-        // Prevent navigation to locked tabs
         if (shouldTabBeLocked(filename)) {
           e.preventDefault();
-
-          // Show locked message
           alert('This tab is currently locked. Complete your investigation first.');
           return false;
         }
@@ -355,7 +312,6 @@ const { pageId } = Astro.props;
           updateCounter();
         }
 
-        // Close sidebar on mobile after clicking
         const sidebar = document.getElementById('sidebar');
         if (window.innerWidth <= 768 && sidebar) {
           sidebar.classList.remove('open');
@@ -363,7 +319,6 @@ const { pageId } = Astro.props;
       });
     });
 
-    // Mobile menu toggle
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
 
@@ -373,7 +328,6 @@ const { pageId } = Astro.props;
       });
     }
 
-    // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
       if (window.innerWidth <= 768 &&
         sidebar && !sidebar.contains(e.target) &&
@@ -383,7 +337,6 @@ const { pageId } = Astro.props;
       }
     });
 
-    // Handle resize events
     window.addEventListener('resize', () => {
       if (window.innerWidth > 768 && sidebar) {
         sidebar.classList.remove('open');
