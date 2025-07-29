@@ -35,11 +35,6 @@ import { pages } from '../data/pages.js';
       }
     })}
   </div>
-  
-  <!-- Reset button at the bottom of sidebar -->
-  <div class="sidebar-footer">
-    <button id="resetCase" class="reset-button sidebar-reset">Reset Case</button>
-  </div>
 </div>
 
 <style>
@@ -72,7 +67,7 @@ import { pages } from '../data/pages.js';
     border: 2px solid #ff6b6b;
   }
 
-  /* Inventory Styles */
+  /* Inventory Styles - 30% smaller */
   .inventory-container {
     margin-bottom: 20px;
     border-radius: 8px;
@@ -81,30 +76,60 @@ import { pages } from '../data/pages.js';
     background-image: url('/assets/inventory-bg.jpg');
     background-size: cover;
     background-position: center;
-    /* Make it square-ish based on sidebar width */
-    height: 240px; 
+    /* 30% smaller than original 260px = 182px */
+    height: 160px;
+    min-height: 160px;
+    max-height: 160px;
+    width: 100%;
     padding: 10px;
-    overflow: hidden; /* Hide overflow to ensure scrolling works properly */
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
   }
 
   .inventory-grid {
-    height: 100%; /* Make grid fill the container */
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
     overflow-y: auto; /* Enable vertical scrolling for items */
-    display: flex; /* Change from grid to flex */
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Center items horizontally */
-    gap: 40px; /* Increase gap between items for better separation */
-    padding: 20px 0; /* Add padding top and bottom */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px; /* 30% smaller gap */
+    padding: 14px 0; /* 30% smaller padding */
+    box-sizing: border-box;
   }
 
-  .inventory-grid .inventory-item {
-    width: 75%; /* Make items take most of the width */
-    height: auto;
-    aspect-ratio: 1 / 1; /* Keep items square */
-    object-fit: cover;
+  /* Customize scrollbar for inventory */
+  .inventory-grid::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .inventory-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+  .inventory-grid::-webkit-scrollbar-thumb {
+    background: #d1a000;
+    border-radius: 3px;
+  }
+
+  /* 30% smaller than original 100px = 70px */
+  .inventory-item {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
+    object-fit: contain !important;
     border-radius: 5px;
     border: 2px solid #d1a000;
     background-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   }
 
   .link-list {
@@ -182,22 +207,6 @@ import { pages } from '../data/pages.js';
     display: inline-block;
     font-weight: bold;
   }
-  
-  /* Sidebar footer with reset button */
-  .sidebar-footer {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #444;
-    text-align: center;
-  }
-  
-  .sidebar-reset {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    font-size: 1rem;
-    font-weight: bold;
-  }
 
   /* Mobile styles */
   @media (max-width: 768px) {
@@ -210,6 +219,26 @@ import { pages } from '../data/pages.js';
     .sidebar.open {
       transform: translateX(0); /* Bring into view when open */
     }
+    
+    /* Maintain proportions on mobile */
+    .inventory-container {
+      height: 160px;
+      min-height: 160px;
+      max-height: 160px;
+    }
+    
+    .inventory-item {
+      width: 45px !important;
+      height: 45px !important;
+      min-width: 45px !important;
+      min-height: 45px !important;
+      max-width: 45px !important;
+      max-height: 45px !important;
+    }
+    
+    .inventory-grid {
+      gap: 24px; /* Smaller gap for mobile */
+    }
   }
 
   /* Small mobile styles */
@@ -217,26 +246,25 @@ import { pages } from '../data/pages.js';
     .sidebar {
       width: 200px;
     }
+    
+    /* Maintain proportions on small mobile */
+    .inventory-container {
+      height: 110px;
+      min-height: 110px;
+      max-height: 110px;
+    }
+    
+    .inventory-item {
+      width: 25px !important;
+      height: 25px !important;
+      min-width: 25px !important;
+      min-height: 25px !important;
+      max-width: 25px !important;
+      max-height: 25px !important;
+    }
+    
+    .inventory-grid {
+      gap: 20px; /* Even smaller gap for small mobile */
+    }
   }
 </style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('resetCase').addEventListener('click', function() {
-      // Show confirmation dialog
-      if (confirm('Are you sure you want to reset this case? All your progress will be lost.')) {
-        // Clear localStorage
-        localStorage.clear();
-        
-        // Clear sessionStorage
-        sessionStorage.clear();
-        
-        // Show feedback
-        alert('Case has been reset. The page will now reload.');
-        
-        // Reload the page to apply the reset
-        window.location.reload();
-      }
-    });
-  });
-</script>
