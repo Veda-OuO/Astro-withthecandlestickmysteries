@@ -1,3 +1,7 @@
+/* ==========================================================================
+   Global and Game Page Styles
+   ========================================================================== */
+
 /* Reset styles */
 * {
   box-sizing: border-box;
@@ -5,36 +9,34 @@
   padding: 0;
 }
 
-html,
-body {
+html, body {
   font-family: Georgia, sans-serif;
   height: 100%;
 }
 
 p {
-  /* Add this to reset paragraph margins */
   margin: 0;
 }
 
-/* Unified Text Box Styles */
+/* Game Page Text Box Styles */
 .text-box,
 .secondary-text-box {
   background-color: rgba(209, 209, 209, 0.925);
   color: rgb(0, 0, 0);
-  padding: 2rem; /* Consistent padding */
+  padding: 2rem;
   overflow-y: auto;
-  border-radius: 0.5rem; /* Soften the corners */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3); /* Refined shadow */
-  max-height: calc(100vh - 200px); /* Adjusted max-height */
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+  max-height: calc(100vh - 200px);
   position: relative;
   z-index: 1;
-  font-size: 1.125rem; /* Unified font size (18px equivalent) */
-  line-height: 1.6; /* Unified line height for readability */
-  margin-bottom: 2rem; /* Consistent spacing between text boxes */
-  max-width: 85%; /* More responsive max-width */
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 85%;
 }
 
-/* Banner Styles */
+/* Game Page Banner */
 .banner {
   width: 100%;
   background-color: #000000;
@@ -45,20 +47,20 @@ p {
   left: 0;
   z-index: 1000;
   text-align: center;
-  font-size: 1.125rem; /* 18px equivalent, adjust as needed */
+  font-size: 1.125rem;
   height: 50px;
 }
 
-/* Container Styles */
+/* Game Page Container */
 .container {
   display: flex;
   min-height: 100vh;
   padding-top: 50px;
 }
 
-/* Mobile menu toggle button */
+/* Game Page Menu Toggle */
 .menu-toggle {
-  display: none; /* Hidden by default */
+  display: none;
   position: fixed;
   top: 60px;
   left: 10px;
@@ -73,23 +75,22 @@ p {
 
 /* Bottom Image Styling */
 .bottom-image {
-  display: flex; /* Enable flexbox */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  margin: 20px auto; /* Add spacing around the container */
-  max-width: 100%; /* Ensure the container doesn't exceed the page width */
-  text-align: center; /* Center the content */
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
 }
 
 .bottom-image-style {
-  display: block; /* Ensure it's a block-level element */
-  max-width: 100%; /* Ensure the image doesn't exceed the container's width */
-  height: auto; /* Maintain the aspect ratio */
-  object-fit: contain; /* Ensure the image fits within its container */
-  margin: 0 auto; /* Center the image horizontally */
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
 }
 
-/* Page-specific background image */
+
+
+
+/* Game Page Background Image */
 .page-background {
   background-image: var(--page-background-image);
   background-size: cover;
@@ -100,62 +101,161 @@ p {
   height: 100%;
 }
 
-/* Notification styling */
-.notification {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  z-index: 9999;
-}
-
-/* Media Queries */
-
-/* Mobile Styles */
+/* Media Queries for Game Pages */
 @media (max-width: 768px) {
   .menu-toggle {
-    display: block; /* Show menu button on mobile */
+    display: block;
   }
-
   .text-box,
   .secondary-text-box {
-    font-size: 1rem; /* Adjust font size for smaller screens */
-    padding: 1.5rem; /* Adjust padding for smaller screens */
-    max-height: calc(100vh - 150px); /* Adjust max-height for smaller screens */
-    max-width: 100%; /* Take up more width on smaller screens */
-  }
-
-  .bottom-image-style {
-    max-width: 90%; /* Scale the image for smaller screens */
+    max-width: 100%;
   }
 }
 
-/* Small Mobile Styles */
-@media (max-width: 480px) {
-  .title {
-    font-size: 2rem;
-  }
-
-  .bottom-image-style {
-    max-width: 100%; /* Ensure the image fits the screen */
+/* Media query for tablets and smaller laptops */
+@media (min-width: 790px) and (max-width: 1300px) {
+  .text-box,
+  .secondary-text-box {
+    max-width: 100%;
   }
 }
 
-/* iPad Styles */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .text-box,
-  .secondary-text-box {
-    font-size: 1.1rem; /* Adjust font size for iPads */
-    padding: 1.75rem; /* Adjust padding for iPads */
-    max-height: calc(100vh - 180px); /* Adjust max-height for iPads */
-    max-width: 100%; /* Take up more width on iPads */
-  }
 
-  .bottom-image-style {
-    max-width: 80%; /* Scale the image for iPads */
+
+
+/* ==========================================================================
+   Scoped Landing Page Styles
+   ========================================================================== */
+
+.landing-page {
+  font-family: 'Inter', sans-serif;
+  background-image: url('/assets/rules.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+  position: relative;
+}
+
+.landing-page::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+.landing-page header {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.landing-page .logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+}
+
+.landing-page nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.landing-page nav a {
+  color: #f0f0f0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.landing-page nav a:hover {
+  color: #ffc107;
+}
+
+.landing-page .menu-toggle {
+  display: none;
+}
+
+.landing-page main {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.landing-page h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #fff;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+}
+
+.landing-page p.intro {
+  text-align: center;
+  font-size: 1.15rem;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.landing-page .case-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2.5rem;
+  padding: 0 1rem;
+}
+
+.landing-page .case-box {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.landing-page .case-box:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.landing-page .case-box a {
+  display: block;
+  text-decoration: none;
+}
+
+.landing-page .case-image {
+  width: 100%;
+  display: block;
+  border-radius: 12px;
+}
+/* ==========================================================================
+   Game Page Main Content Area
+   ========================================================================== */
+
+.main {
+  margin-left: 280px; /* Pushes content to the right of the sidebar */
+  flex-grow: 1;
+  padding: 20px;
+  position: relative;
+  min-height: calc(100vh - 50px);
+  background-color: rgba(255, 255, 255, 0.01); 
+  z-index: 0; 
+}
+
+/* On mobile, the sidebar is hidden, so we remove the margin */
+@media (max-width: 768px) {    
+  .main {
+    margin-left: 0;
+    padding: 10px;
   }
 }
