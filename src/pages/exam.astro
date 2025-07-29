@@ -139,9 +139,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const submitButton = document.getElementById('submitAnswers');
+    const submitButton = document.getElementById('submitAnswers') as HTMLButtonElement;
     const submissionStatus = document.getElementById('submission-status');
     const textareas = document.querySelectorAll('.notes-textarea');
+    
+    // Make sure elements exist before proceeding
+    if (!submitButton || !submissionStatus) return;
     
     // Check if already submitted
     if (localStorage.getItem('examSubmitted') === 'true') {
@@ -151,9 +154,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       
       // Make all textareas readonly
       textareas.forEach(textarea => {
-        textarea.readOnly = true;
-        textarea.style.backgroundColor = 'rgba(240, 240, 240, 0.9)';
-        textarea.style.cursor = 'not-allowed';
+        // Type assertion to tell TypeScript this is an HTMLTextAreaElement
+        const textareaElement = textarea as HTMLTextAreaElement;
+        textareaElement.readOnly = true;
+        textareaElement.style.backgroundColor = 'rgba(240, 240, 240, 0.9)';
+        textareaElement.style.cursor = 'not-allowed';
       });
     }
     
@@ -169,9 +174,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       
       // Make all textareas readonly
       textareas.forEach(textarea => {
-        textarea.readOnly = true;
-        textarea.style.backgroundColor = 'rgba(240, 240, 240, 0.9)';
-        textarea.style.cursor = 'not-allowed';
+        // Type assertion to tell TypeScript this is an HTMLTextAreaElement
+        const textareaElement = textarea as HTMLTextAreaElement;
+        textareaElement.readOnly = true;
+        textareaElement.style.backgroundColor = 'rgba(240, 240, 240, 0.9)';
+        textareaElement.style.cursor = 'not-allowed';
       });
       
       // Trigger event to update sidebar
