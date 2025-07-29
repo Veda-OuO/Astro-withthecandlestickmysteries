@@ -51,6 +51,26 @@ p {
   height: 50px;
 }
 
+.home-button {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.home-button:hover {
+  background-color: white;
+  color: black;
+}
+
+
 /* Game Page Container */
 .container {
   display: flex;

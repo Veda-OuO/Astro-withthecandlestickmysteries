@@ -4,6 +4,14 @@ import { pages } from '../data/pages.js';
 
 <div class="sidebar" id="sidebar">
   <div class="counter">Investigative Hours: <span id="counter">0</span></div>
+  
+  <!-- Inventory Section -->
+  <div class="inventory-container">
+    <div id="inventory-grid" class="inventory-grid">
+      <!-- Item images will be dynamically added here -->
+    </div>
+  </div>
+
   <div class="link-list" id="linkList">
     {pages.map(item => {
       if (item.type === 'category') {
@@ -56,6 +64,42 @@ import { pages } from '../data/pages.js';
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     border: 2px solid #ff6b6b;
   }
+
+ /* Inventory Styles */
+  .inventory-container {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    /* Set a background image for the inventory */
+    background-image: url('/assets/inventory-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    /* Make it square-ish based on sidebar width */
+    height: 240px; 
+    padding: 10px;
+    overflow: hidden; /* Hide overflow to ensure scrolling works properly */
+  }
+
+  .inventory-grid {
+    height: 100%; /* Make grid fill the container */
+    overflow-y: auto; /* Enable vertical scrolling for items */
+    display: flex; /* Change from grid to flex */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    gap: 40px; /* Increase gap between items for better separation */
+    padding: 20px 0; /* Add padding top and bottom */
+  }
+
+  .inventory-grid .inventory-item {
+    width: 75%; /* Make items take most of the width */
+    height: auto;
+    aspect-ratio: 1 / 1; /* Keep items square */
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #d1a000;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
 
   .link-list a {
     display: block;
@@ -145,6 +189,6 @@ import { pages } from '../data/pages.js';
   @media (max-width: 480px) {
     .sidebar {
       width: 200px;
-    }
+          }
   }
 </style>
