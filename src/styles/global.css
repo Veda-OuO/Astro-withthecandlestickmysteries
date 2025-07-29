@@ -49,27 +49,48 @@ p {
   text-align: center;
   font-size: 1.125rem;
   height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.home-button {
+.banner span {
+  display: inline-block;
+  max-width: calc(100% - 100px); /* Adjusted for single button */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Banner buttons container */
+.banner-buttons {
   position: absolute;
   right: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
-  color: white;
-  text-decoration: none;
-  padding: 0.4rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 5px;
-  font-size: 0.9rem;
-  transition: background-color 0.2s, color 0.2s;
 }
 
-.home-button:hover {
-  background-color: white;
-  color: black;
+/* For smaller screens, adjust the layout */
+@media (max-width: 480px) {
+  .banner {
+    justify-content: flex-start;
+    padding-left: 10px;
+  }
+  
+  .banner span {
+    max-width: calc(100% - 80px); /* Adjusted for single button */
+    font-size: 1rem;
+  }
+  
+  .banner-buttons {
+    right: 10px;
+  }
+  
+  .home-button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
 }
-
 
 /* Game Page Container */
 .container {
@@ -278,4 +299,84 @@ p {
     margin-left: 0;
     padding: 10px;
   }
+}
+
+/* Add these animations for the event box */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+.event-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-family: 'Playfair Display', serif;
+}
+
+.event-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.event-box li {
+  margin-bottom: 5px;
+}
+
+.event-box .close-event-box:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.home-button {
+  color: white;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.home-button:hover {
+  background-color: white;
+  color: black;
+}
+
+/* Sidebar footer with reset button */
+.sidebar-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+  text-align: center;
+}
+
+.sidebar-reset {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #8B0000;
+  color: white;
+  border: 2px solid #ff6b6b;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  font-family: Georgia, serif;
+}
+
+.sidebar-reset:hover {
+  background-color: #a00000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+.sidebar-reset:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }

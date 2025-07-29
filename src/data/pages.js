@@ -7,7 +7,7 @@
 export const items = {
   closet_key2: { 
     name: "Shattered Dragon Figurine",
-    image: "/assets/items/key2.jpg" 
+    image: "/assets/items/key3.jpg" 
   },
   closet_key: {
     name: "Small Iron Key",

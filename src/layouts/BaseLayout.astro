@@ -1,5 +1,5 @@
 ---
-import '../styles/global.css'; // ADD THIS LINE
+import '../styles/global.css'; 
 import Sidebar from '../components/Sidebar.astro';
 import VisitTracker from '../components/VisitTracker.astro';
 
@@ -31,7 +31,9 @@ const { title, pageId } = Astro.props;
 <body class="page-background">
   <div class="banner">
     <span>Case 1: Where's Wesley</span>
-    <a href="/" class="home-button">Home</a>
+    <div class="banner-buttons">
+      <a href="/" class="home-button">Home</a>
+    </div>
   </div>
   <button class="menu-toggle" id="menuToggle">☰ Menu</button>
   
@@ -45,6 +47,3 @@ const { title, pageId } = Astro.props;
   </div>
 </body>
 </html>
-
-
-

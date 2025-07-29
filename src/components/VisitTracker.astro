@@ -126,7 +126,7 @@ const { pageId } = Astro.props;
               align-items: center;
               justify-content: center;
               font-size: 14px;
-              border: 1px solid white;
+              border: 2px solid white;
               box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
             `;
             
@@ -145,7 +145,7 @@ const { pageId } = Astro.props;
 
   function saveInventory() {
     try {
-      localStorage.setItem("inventory", JSON.stringify(inventory)); // No need for [...inventory] conversion
+      localStorage.setItem("inventory", JSON.stringify(inventory));
     } catch (e) {
       console.error("Error saving inventory:", e);
     }
@@ -275,7 +275,8 @@ const { pageId } = Astro.props;
     const page = pages.find(p => p.filename === filename);
     if (!page) return false;
 
-    if (page.requiresItem && !inventory.includes(page.requiresItem)) { // Changed from has() to includes()
+    // Always check if an item is required, regardless of whether the page has been visited
+    if (page.requiresItem && !inventory.includes(page.requiresItem)) {
       return true;
     }
 
@@ -350,11 +351,94 @@ const { pageId } = Astro.props;
     const notification = document.createElement('div');
     notification.className = 'notification';
     notification.textContent = message;
+    notification.style.cssText = `
+      background-color: rgba(139, 0, 0, 0.9);
+      color: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.5s;
+    `;
+    
     mainElement.prepend(notification);
 
     setTimeout(() => {
-      notification.remove();
+      notification.style.animation = 'fadeOut 0.5s';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
     }, 3000);
+  }
+
+    // New function to create the event box
+  function showEventBox(messages) {
+    const mainElement = document.querySelector('.main');
+    if (!mainElement) {
+      console.warn("Warning: `.main` element not found. Event box not displayed.");
+      return;
+    }
+
+    // Find the first text-box in the main element
+    const firstTextBox = mainElement.querySelector('.text-box');
+    
+    const eventBox = document.createElement('div');
+    eventBox.className = 'event-box';
+    eventBox.innerHTML = `
+      <h3>Events</h3>
+      <ul>
+        ${messages.map(msg => `<li>${msg}</li>`).join('')}
+      </ul>
+      <button class="close-event-box">Close</button>
+    `;
+    
+    // Add styles inline to ensure they're applied
+    eventBox.style.cssText = `
+      background-color: rgba(139, 0, 0, 0.9);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      border: 2px solid #ff6b6b;
+      animation: fadeIn 0.5s;
+    `;
+    
+    // Style for the close button
+    const closeButton = eventBox.querySelector('.close-event-box');
+    closeButton.style.cssText = `
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: transparent;
+      color: white;
+      border: 1px solid white;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+    `;
+    
+    // Insert the event box before the first text box
+    if (firstTextBox) {
+      firstTextBox.parentNode.insertBefore(eventBox, firstTextBox);
+    } else {
+      mainElement.prepend(eventBox);
+    }
+    
+    // Add event listener for the close button
+    closeButton.addEventListener('click', () => {
+      eventBox.style.animation = 'fadeOut 0.5s';
+      setTimeout(() => {
+        if (eventBox.parentNode) {
+          eventBox.remove();
+        }
+      }, 500);
+    });
+    
+    // Auto-close timeout has been removed
   }
 
   if (pageId && !visited.has(pageId)) {
@@ -363,32 +447,32 @@ const { pageId } = Astro.props;
 
     const currentPage = pages.find(p => p.filename === pageId);
     if (currentPage) {
-      let notificationMessage = '';
+      let eventMessages = [];
 
       // Handle adding multiple items
       if (currentPage.addsItems && Array.isArray(currentPage.addsItems)) {
         currentPage.addsItems.forEach(itemId => {
-          inventory.push(itemId); // Changed from add() to push()
-          notificationMessage += `Item added: ${items[itemId].name}. `;
+          inventory.push(itemId);
+          eventMessages.push(`Item added: ${items[itemId].name}`);
         });
         saveInventory();
       }
       
       // Handle single item addition
       if (currentPage.addsItem) {
-        inventory.push(currentPage.addsItem); // Changed from add() to push()
+        inventory.push(currentPage.addsItem);
         saveInventory();
-        notificationMessage += `Item added: ${items[currentPage.addsItem].name}. `;
+        eventMessages.push(`Item added: ${items[currentPage.addsItem].name}`);
       }
 
-      if (currentPage.removesItem && inventory.includes(currentPage.removesItem)) { // Changed from has() to includes()
+      if (currentPage.removesItem && inventory.includes(currentPage.removesItem)) {
         // Find and remove the first occurrence of the item
         const index = inventory.indexOf(currentPage.removesItem);
         if (index > -1) {
           inventory.splice(index, 1);
         }
         saveInventory();
-        notificationMessage += `Item used: ${items[currentPage.removesItem].name}. `;
+        eventMessages.push(`Item used: ${items[currentPage.removesItem].name}`);
       }
 
       if (currentPage.unlocksOnVisit) {
@@ -397,7 +481,7 @@ const { pageId } = Astro.props;
           if (pageToUnlock) {
             pageToUnlock.initialLocked = false;
             localStorage.setItem(`locked_${pageToUnlock.filename}`, "false");
-            notificationMessage += `${pageToUnlock.title} unlocked. `;
+            eventMessages.push(`${pageToUnlock.title} unlocked`);
           }
         });
       }
@@ -408,13 +492,14 @@ const { pageId } = Astro.props;
           if (pageToLock) {
             pageToLock.initialLocked = true;
             localStorage.setItem(`locked_${pageToLock.filename}`, "true");
-            notificationMessage += `${pageToLock.title} locked. `;
+            eventMessages.push(`${pageToLock.title} locked`);
           }
         });
       }
 
-      if (notificationMessage) {
-        showNotification(notificationMessage);
+      if (eventMessages.length > 0) {
+        // Use the event box to show all events that happened
+        showEventBox(eventMessages);
       }
 
       updateLinkStates();
@@ -424,7 +509,7 @@ const { pageId } = Astro.props;
   document.addEventListener('DOMContentLoaded', () => {
     updateCounter();
     updateInventoryDisplay();
-    updateLinkStates();
+    updateLinkStates(); // This will check item requirements on every page load
 
     // This listener handles the custom event from the exam page
     window.addEventListener('examCompleted', () => {
@@ -442,7 +527,7 @@ const { pageId } = Astro.props;
 
         if (shouldTabBeLocked(filename)) {
           e.preventDefault();
-          if (page && page.requiresItem && !inventory.includes(page.requiresItem)) { // Changed from has() to includes()
+          if (page && page.requiresItem && !inventory.includes(page.requiresItem)) {
             alert(`This tab is locked. You need the following item to proceed: ${items[page.requiresItem].name}`);
           } else {
             alert('This tab is currently locked. Complete your investigation first.');
