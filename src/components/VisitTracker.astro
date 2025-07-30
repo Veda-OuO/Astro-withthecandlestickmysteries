@@ -10,74 +10,224 @@ const { pageId } = Astro.props;
 ---
 
 <script define:vars={{ pageId, pages, items }}>
-  // Game state variables
-  let visited = new Set();
-  let inventory = []; // Changed from Set to Array
-  let examUnlocked = false;
-  let whodunitUnlocked = false;
-  let timeReachedZero = false;
-
-  // Initialize from localStorage
-  try {
-    const stored = localStorage.getItem("visitedPages");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) {
-        visited = new Set(parsed);
-      }
+  // --- 1. State Management Class ---
+  class GameState {
+    constructor() {
+      this.visited = new Set();
+      this.inventory = [];
+      this.examUnlocked = false;
+      this.whodunitUnlocked = false;
+      this.timeReachedZero = false;
+      this.loadState();
     }
 
-    const storedInventory = localStorage.getItem("inventory");
-    if (storedInventory) {
-      const parsedInventory = JSON.parse(storedInventory);
-      if (Array.isArray(parsedInventory)) {
-        inventory = parsedInventory; // Now directly uses the array
-      }
-    }
+    loadState() {
+      try {
+        const storedVisited = localStorage.getItem("visitedPages");
+        if (storedVisited) this.visited = new Set(JSON.parse(storedVisited));
 
-    examUnlocked = localStorage.getItem("examUnlocked") === "true";
-    whodunitUnlocked = localStorage.getItem("whodunitUnlocked") === "true";
-    timeReachedZero = localStorage.getItem("timeReachedZero") === "true";
+        const storedInventory = localStorage.getItem("inventory");
+        if (storedInventory) this.inventory = JSON.parse(storedInventory);
 
-    if (Array.isArray(pages)) {
-      pages.forEach(page => {
-        if (page.type === 'link') {
-          const lockedState = localStorage.getItem(`locked_${page.filename}`);
-          if (lockedState !== null) {
-            page.initialLocked = lockedState === "true";
+        this.examUnlocked = localStorage.getItem("examUnlocked") === "true";
+        this.whodunitUnlocked = localStorage.getItem("whodunitUnlocked") === "true";
+        this.timeReachedZero = localStorage.getItem("timeReachedZero") === "true";
+
+        pages.forEach(page => {
+          if (page.type === 'link') {
+            const lockedState = localStorage.getItem(`locked_${page.filename}`);
+            if (lockedState !== null) page.initialLocked = lockedState === "true";
           }
+        });
+      } catch (e) {
+        console.error("Error loading game state, resetting.", e);
+        localStorage.clear();
+      }
+    }
+
+    saveVisited() {
+      localStorage.setItem("visitedPages", JSON.stringify([...this.visited]));
+    }
+
+    saveInventory() {
+      localStorage.setItem("inventory", JSON.stringify(this.inventory));
+    }
+
+    processPageEffects(pageId) {
+      const currentPage = pages.find(p => p.filename === pageId);
+      if (!currentPage) return;
+      let eventMessages = [];
+
+      // Handle single item addition
+      if (currentPage.addsItem) {
+        this.inventory.push(currentPage.addsItem);
+        this.saveInventory();
+        eventMessages.push(`Item added: ${items[currentPage.addsItem].name}`);
+      }
+      
+      // Handle multiple items
+      if (currentPage.addsItems && Array.isArray(currentPage.addsItems)) {
+        currentPage.addsItems.forEach(itemId => {
+          this.inventory.push(itemId);
+          eventMessages.push(`Item added: ${items[itemId].name}`);
+        });
+        this.saveInventory();
+      }
+
+      // Handle removing items
+      if (currentPage.removesItem && this.inventory.includes(currentPage.removesItem)) {
+        const index = this.inventory.indexOf(currentPage.removesItem);
+        if (index > -1) {
+          this.inventory.splice(index, 1);
+        }
+        this.saveInventory();
+        eventMessages.push(`Item used: ${items[currentPage.removesItem].name}`);
+      }
+
+      // Handle unlocking pages
+      if (currentPage.unlocksOnVisit) {
+        currentPage.unlocksOnVisit.forEach(filename => {
+          const pageToUnlock = pages.find(p => p.filename === filename);
+          if (pageToUnlock) {
+            pageToUnlock.initialLocked = false;
+            localStorage.setItem(`locked_${pageToUnlock.filename}`, "false");
+            eventMessages.push(`${pageToUnlock.title} unlocked`);
+          }
+        });
+      }
+
+      // Handle locking pages
+      if (currentPage.locksOnVisit) {
+        currentPage.locksOnVisit.forEach(filename => {
+          const pageToLock = pages.find(p => p.filename === filename);
+          if (pageToLock) {
+            pageToLock.initialLocked = true;
+            localStorage.setItem(`locked_${pageToLock.filename}`, "true");
+            eventMessages.push(`${pageToLock.title} locked`);
+          }
+        });
+      }
+
+      // Special case for Bird Room: Check if we have the key to unlock the closet
+      if (pageId === 'birdroom' && this.inventory.includes('closet_key')) {
+        const pre1Page = pages.find(p => p.filename === 'pre1');
+        if (pre1Page && pre1Page.initialLocked) {
+          pre1Page.initialLocked = false;
+          localStorage.setItem(`locked_pre1`, "false");
+          eventMessages.push(`PrE - 1 unlocked! You can now access the Bird Room closet with your key.`);
+        }
+      }
+
+      if (eventMessages.length > 0) {
+        this.showEventBox(eventMessages);
+      }
+    }
+
+    // Method to lock all unvisited rooms when time runs out
+    lockUnvisitedRooms() {
+      // Critical pages that should never be locked
+      const criticalPages = ['notes', 'rules', 'intro', 'exam', 'whodunit'];
+      
+      // Find all content pages that haven't been visited
+      pages.forEach(page => {
+        if (page.type === 'link' && 
+            !this.visited.has(page.filename) && 
+            !criticalPages.includes(page.filename)) {
+          
+          // Lock this unvisited page
+          page.initialLocked = true;
+          localStorage.setItem(`locked_${page.filename}`, "true");
+          console.log(`Locking unvisited page: ${page.title}`);
         }
       });
-    } else {
-      console.error("Error: `pages` is not an array or is undefined.");
+      
+      console.log("Time's up! Locked all unvisited rooms and unlocked exam.");
     }
-  } catch (e) {
-    console.error("Error loading game state:", e);
-    localStorage.removeItem("visitedPages");
-    localStorage.removeItem("inventory");
-  }
 
-  function updateInventoryDisplay() {
-    const inventoryGrid = document.getElementById('inventory-grid');
-    if (!inventoryGrid) return;
+    shouldTabBeLocked(filename) {
+      // Critical pages that should never be locked
+      const neverLockPages = ['notes', 'rules', 'intro'];
+      if (neverLockPages.includes(filename)) return false;
+      
+      // Special case for exam - explicitly check if it's unlocked
+      if (filename === 'exam') return !this.examUnlocked;
+      
+      // Special case for whodunit - only accessible after exam
+      if (filename === 'whodunit') return !this.whodunitUnlocked;
+      
+      const page = pages.find(p => p.filename === filename);
+      if (!page) return false;
+      
+      // Check for item requirement
+      if (page.requiresItem && !this.inventory.includes(page.requiresItem)) return true;
+      
+      // Check if it's explicitly marked as locked
+      if (page.initialLocked === true) return true;
+      
+      // If time has run out, lock any unvisited locations
+      if (this.timeReachedZero && !this.visited.has(filename)) return true;
+      
+      return false;
+    }
 
-    inventoryGrid.innerHTML = ''; // Clear current grid
-    
-    // Debug: Print inventory items to console
-    console.log("=== CURRENT INVENTORY ITEMS ===");
-    if (inventory.length === 0) {
-      console.log("No items in inventory");
-    } else {
+    updateAllUI() {
+      this.updateCounter();
+      this.updateInventoryDisplay();
+      this.updateLinkStates();
+    }
+
+    updateCounter() {
+      const countedVisited = [...this.visited].filter(filename => {
+        const page = pages.find(p => p.filename === filename);
+        return page && page.counted !== false;
+      });
+      const remainingHours = Math.max(0, 11 - countedVisited.length);
+      const counter = document.getElementById("counter");
+      if (counter) counter.textContent = remainingHours;
+      
+      // Update counter color based on remaining hours
+      const counterElement = counter?.parentElement;
+      if (counterElement) {
+        if (remainingHours <= 3) {
+          counterElement.style.backgroundColor = '#ff0000';
+        } else if (remainingHours <= 6) {
+          counterElement.style.backgroundColor = '#ff4500';
+        } else {
+          counterElement.style.backgroundColor = '#8B0000';
+        }
+      }
+      
+      // Handle time reaching zero - UPDATED LOGIC HERE
+      if (remainingHours === 0 && !this.timeReachedZero) {
+        this.timeReachedZero = true;
+        this.examUnlocked = true;
+        localStorage.setItem("timeReachedZero", "true");
+        localStorage.setItem("examUnlocked", "true");
+        
+        // Show notification to the player
+        this.showEventBox(["Investigation time has run out! The Exam tab is now available."]);
+        
+        // Lock unvisited rooms but keep critical navigation accessible
+        this.lockUnvisitedRooms();
+        
+        // Make sure link states update
+        this.updateLinkStates();
+      }
+    }
+
+    updateInventoryDisplay() {
+      const inventoryGrid = document.getElementById('inventory-grid');
+      if (!inventoryGrid) return;
+      
+      inventoryGrid.innerHTML = ''; // Clear current grid
+      
       // Create a count map of how many of each item we have
       const itemCounts = {};
-      inventory.forEach(itemId => {
+      this.inventory.forEach(itemId => {
         if (!itemCounts[itemId]) {
           itemCounts[itemId] = 0;
         }
         itemCounts[itemId]++;
-        
-        const itemData = items[itemId];
-        console.log(`• ${itemId}: ${itemData ? itemData.name : 'Unknown Item'}`);
       });
       
       // Process unique items (by ID)
@@ -140,436 +290,195 @@ const { pageId } = Astro.props;
         }
       });
     }
-    console.log("===============================");
-  }
 
-  function saveInventory() {
-    try {
-      localStorage.setItem("inventory", JSON.stringify(inventory));
-    } catch (e) {
-      console.error("Error saving inventory:", e);
-    }
-  }
+    updateLinkStates() {
+      const links = document.querySelectorAll('.nav-link');
+      links.forEach(link => {
+        const filename = link.getAttribute('data-filename');
+        if (!filename) return;
+        
+        // Clear existing states
+        link.classList.remove('visited', 'locked');
+        const existingLock = link.querySelector('.lock-icon');
+        if (existingLock) existingLock.remove();
 
-  function updateCounter() {
-    if (!Array.isArray(pages)) {
-      console.error("Error: `pages` is not an array or is undefined.");
-      return;
-    }
-
-    const countedVisitedPages = [...visited].filter(filename => {
-      const page = pages.find(p => p.filename === filename);
-      return page && page.counted !== false;
-    });
-
-    const visitedCount = countedVisitedPages.length;
-    const remainingHours = Math.max(0, 11 - visitedCount);
-
-    const counter = document.getElementById("counter");
-    if (counter) {
-      counter.textContent = remainingHours;
-    } else {
-      console.warn("Warning: `counter` element not found.");
-    }
-
-    const counterElement = counter?.parentElement;
-    if (counterElement) {
-      if (remainingHours <= 3) {
-        counterElement.style.backgroundColor = '#ff0000';
-      } else if (remainingHours <= 6) {
-        counterElement.style.backgroundColor = '#ff4500';
-      } else {
-        counterElement.style.backgroundColor = '#8B0000';
-      }
-    }
-
-    if (remainingHours === 0 && !timeReachedZero) {
-      handleTimeReachedZero();
-    }
-
-    return remainingHours;
-  }
-
-  function handleTimeReachedZero() {
-    timeReachedZero = true;
-    examUnlocked = true;
-    localStorage.setItem("timeReachedZero", "true");
-    localStorage.setItem("examUnlocked", "true");
-
-    try {
-      showFinalLeadModal();
-    } catch (e) {
-      console.error("Error showing final lead modal:", e);
-    }
-
-    updateLinkStates();
-  }
-
-  function showFinalLeadModal() {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-    `;
-
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 400px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    `;
-
-    modalContent.innerHTML = `
-      <h2 style="color: #8B0000; margin-bottom: 20px;">Investigation Complete</h2>
-      <p style="margin-bottom: 20px; line-height: 1.5;">This is your final lead. Finish your investigation and head to the Exam Tab.</p>
-      <button id="modalClose" style="
-        background-color: #8B0000;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-      ">Continue</button>
-    `;
-
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-
-    document.getElementById('modalClose').addEventListener('click', () => {
-      document.body.removeChild(modal);
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        document.body.removeChild(modal);
-      }
-    });
-  }
-
-  function saveVisitedPages() {
-    try {
-      localStorage.setItem("visitedPages", JSON.stringify([...visited]));
-    } catch (e) {
-      console.error("Error saving visited pages:", e);
-    }
-  }
-
-  function isLockableTab(filename) {
-    const neverLock = ['notes', 'rules', 'intro', 'exam', 'whodunit'];
-    return !neverLock.includes(filename);
-  }
-
-  function shouldTabBeLocked(filename) {
-    const page = pages.find(p => p.filename === filename);
-    if (!page) return false;
-
-    // Always check if an item is required, regardless of whether the page has been visited
-    if (page.requiresItem && !inventory.includes(page.requiresItem)) {
-      return true;
-    }
-
-    if (page.initialLocked === true) {
-      return true;
-    }
-
-    if (filename === 'exam') {
-      return !examUnlocked;
-    }
-    if (filename === 'whodunit') {
-      return !whodunitUnlocked;
-    }
-
-    if (!timeReachedZero) {
-      return false;
-    }
-
-    if (isLockableTab(filename) && !visited.has(filename)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  function updateLinkStates() {
-    if (!Array.isArray(pages)) {
-      console.error("Error: `pages` is not an array or is undefined.");
-      return;
-    }
-
-    const links = document.querySelectorAll('.nav-link');
-    if (links.length === 0) {
-      console.warn("Warning: No `.nav-link` elements found.");
-      return;
-    }
-
-    links.forEach(link => {
-      const filename = link.getAttribute('data-filename');
-      if (!filename) return;
-
-      link.classList.remove('visited', 'locked');
-
-      const existingLock = link.querySelector('.lock-icon');
-      if (existingLock) {
-        existingLock.remove();
-      }
-
-      if (visited.has(filename)) {
-        link.classList.add('visited');
-      }
-
-      if (shouldTabBeLocked(filename)) {
-        link.classList.add('locked');
-
-        const lockIcon = document.createElement('span');
-        lockIcon.className = 'lock-icon';
-        lockIcon.innerHTML = ' 🔒';
-        lockIcon.style.color = '#FFD700';
-        link.appendChild(lockIcon);
-      }
-    });
-  }
-
-  function showNotification(message) {
-    const mainElement = document.querySelector('.main');
-    if (!mainElement) {
-      console.warn("Warning: `.main` element not found. Notification not displayed.");
-      return;
-    }
-
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    notification.style.cssText = `
-      background-color: rgba(139, 0, 0, 0.9);
-      color: white;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-      animation: fadeIn 0.5s;
-    `;
-    
-    mainElement.prepend(notification);
-
-    setTimeout(() => {
-      notification.style.animation = 'fadeOut 0.5s';
-      setTimeout(() => {
-        notification.remove();
-      }, 500);
-    }, 3000);
-  }
-
-    // New function to create the event box
-  function showEventBox(messages) {
-    const mainElement = document.querySelector('.main');
-    if (!mainElement) {
-      console.warn("Warning: `.main` element not found. Event box not displayed.");
-      return;
-    }
-
-    // Find the first text-box in the main element
-    const firstTextBox = mainElement.querySelector('.text-box');
-    
-    const eventBox = document.createElement('div');
-    eventBox.className = 'event-box';
-    eventBox.innerHTML = `
-      <h3>Events</h3>
-      <ul>
-        ${messages.map(msg => `<li>${msg}</li>`).join('')}
-      </ul>
-      <button class="close-event-box">Close</button>
-    `;
-    
-    // Add styles inline to ensure they're applied
-    eventBox.style.cssText = `
-      background-color: rgba(139, 0, 0, 0.9);
-      color: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      position: relative;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      border: 2px solid #ff6b6b;
-      animation: fadeIn 0.5s;
-    `;
-    
-    // Style for the close button
-    const closeButton = eventBox.querySelector('.close-event-box');
-    closeButton.style.cssText = `
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: transparent;
-      color: white;
-      border: 1px solid white;
-      border-radius: 4px;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 12px;
-    `;
-    
-    // Insert the event box before the first text box
-    if (firstTextBox) {
-      firstTextBox.parentNode.insertBefore(eventBox, firstTextBox);
-    } else {
-      mainElement.prepend(eventBox);
-    }
-    
-    // Add event listener for the close button
-    closeButton.addEventListener('click', () => {
-      eventBox.style.animation = 'fadeOut 0.5s';
-      setTimeout(() => {
-        if (eventBox.parentNode) {
-          eventBox.remove();
+        // Apply visited class
+        if (this.visited.has(filename)) {
+          link.classList.add('visited');
         }
-      }, 500);
-    });
+        
+        // Apply lock if needed
+        if (this.shouldTabBeLocked(filename)) {
+          link.classList.add('locked');
+          const lockIcon = document.createElement('span');
+          lockIcon.className = 'lock-icon';
+          lockIcon.innerHTML = ' 🔒';
+          lockIcon.style.color = '#FFD700';
+          link.appendChild(lockIcon);
+        }
+      });
+    }
     
-    // Auto-close timeout has been removed
-  }
-
-  if (pageId && !visited.has(pageId)) {
-    visited.add(pageId);
-    saveVisitedPages();
-
-    const currentPage = pages.find(p => p.filename === pageId);
-    if (currentPage) {
-      let eventMessages = [];
-
-      // Handle adding multiple items
-      if (currentPage.addsItems && Array.isArray(currentPage.addsItems)) {
-        currentPage.addsItems.forEach(itemId => {
-          inventory.push(itemId);
-          eventMessages.push(`Item added: ${items[itemId].name}`);
-        });
-        saveInventory();
+    showEventBox(messages) {
+      const mainElement = document.querySelector('.main');
+      if (!mainElement) return;
+      
+      const firstTextBox = mainElement.querySelector('.text-box');
+      
+      const eventBox = document.createElement('div');
+      eventBox.className = 'event-box';
+      eventBox.innerHTML = `
+        <h3>Events</h3>
+        <ul>
+          ${messages.map(msg => `<li>${msg}</li>`).join('')}
+        </ul>
+        <button class="close-event-box">Close</button>
+      `;
+      
+      // Add styles inline to ensure they're applied
+      eventBox.style.cssText = `
+        background-color: rgba(139, 0, 0, 0.9);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border: 2px solid #ff6b6b;
+        animation: fadeIn 0.5s;
+      `;
+      
+      // Style for the close button
+      const closeButton = eventBox.querySelector('.close-event-box');
+      closeButton.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: transparent;
+        color: white;
+        border: 1px solid white;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+      `;
+      
+      // Insert the event box before the first text box
+      if (firstTextBox) {
+        firstTextBox.parentNode.insertBefore(eventBox, firstTextBox);
+      } else {
+        mainElement.prepend(eventBox);
       }
       
-      // Handle single item addition
-      if (currentPage.addsItem) {
-        inventory.push(currentPage.addsItem);
-        saveInventory();
-        eventMessages.push(`Item added: ${items[currentPage.addsItem].name}`);
-      }
-
-      if (currentPage.removesItem && inventory.includes(currentPage.removesItem)) {
-        // Find and remove the first occurrence of the item
-        const index = inventory.indexOf(currentPage.removesItem);
-        if (index > -1) {
-          inventory.splice(index, 1);
-        }
-        saveInventory();
-        eventMessages.push(`Item used: ${items[currentPage.removesItem].name}`);
-      }
-
-      if (currentPage.unlocksOnVisit) {
-        currentPage.unlocksOnVisit.forEach(filename => {
-          const pageToUnlock = pages.find(p => p.filename === filename);
-          if (pageToUnlock) {
-            pageToUnlock.initialLocked = false;
-            localStorage.setItem(`locked_${pageToUnlock.filename}`, "false");
-            eventMessages.push(`${pageToUnlock.title} unlocked`);
+      // Add event listener for the close button
+      closeButton.addEventListener('click', () => {
+        eventBox.style.animation = 'fadeOut 0.5s';
+        setTimeout(() => {
+          if (eventBox.parentNode) {
+            eventBox.remove();
           }
-        });
-      }
-
-      if (currentPage.locksOnVisit) {
-        currentPage.locksOnVisit.forEach(filename => {
-          const pageToLock = pages.find(p => p.filename === filename);
-          if (pageToLock) {
-            pageToLock.initialLocked = true;
-            localStorage.setItem(`locked_${pageToLock.filename}`, "true");
-            eventMessages.push(`${pageToLock.title} locked`);
-          }
-        });
-      }
-
-      if (eventMessages.length > 0) {
-        // Use the event box to show all events that happened
-        showEventBox(eventMessages);
-      }
-
-      updateLinkStates();
+        }, 500);
+      });
     }
-  }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    updateCounter();
-    updateInventoryDisplay();
-    updateLinkStates(); // This will check item requirements on every page load
+    setupEventListeners() {
+      // Exam completion listener
+      window.addEventListener('examCompleted', () => {
+        this.whodunitUnlocked = true;
+        localStorage.setItem('whodunitUnlocked', 'true');
+        this.updateLinkStates();
+      });
 
-    // This listener handles the custom event from the exam page
-    window.addEventListener('examCompleted', () => {
-      console.log('Exam completion event received. Unlocking whodunit.');
-      whodunitUnlocked = true;
-      localStorage.setItem('whodunitUnlocked', 'true');
-      updateLinkStates();
-    });
-
-    const links = document.querySelectorAll('.nav-link');
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        const filename = link.getAttribute('data-filename');
-        const page = pages.find(p => p.filename === filename);
-
-        if (shouldTabBeLocked(filename)) {
-          e.preventDefault();
-          if (page && page.requiresItem && !inventory.includes(page.requiresItem)) {
-            alert(`This tab is locked. You need the following item to proceed: ${items[page.requiresItem].name}`);
-          } else {
-            alert('This tab is currently locked. Complete your investigation first.');
+      // Link click listeners
+      const links = document.querySelectorAll('.nav-link');
+      links.forEach(link => {
+        link.addEventListener('click', (e) => {
+          const filename = link.getAttribute('data-filename');
+          const page = pages.find(p => p.filename === filename);
+          
+          if (this.shouldTabBeLocked(filename)) {
+            e.preventDefault();
+            if (page && page.requiresItem && !this.inventory.includes(page.requiresItem)) {
+              alert(`This tab is locked. You need the following item to proceed: ${items[page.requiresItem].name}`);
+            } else {
+              alert('This tab is currently locked.');
+            }
+            return false;
           }
-          return false;
-        }
 
-        if (filename && !visited.has(filename)) {
-          visited.add(filename);
-          saveVisitedPages();
-          updateCounter();
-        }
+          // Handle sidebar on mobile
+          const sidebar = document.getElementById('sidebar');
+          if (window.innerWidth <= 768 && sidebar) {
+            sidebar.classList.remove('open');
+          }
+        });
+      });
 
-        const sidebar = document.getElementById('sidebar');
-        if (window.innerWidth <= 768 && sidebar) {
+      // Menu toggle for mobile
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+        });
+      }
+      
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 &&
+          sidebar && !sidebar.contains(e.target) &&
+          menuToggle && !menuToggle.contains(e.target) &&
+          sidebar.classList.contains('open')) {
           sidebar.classList.remove('open');
         }
       });
-    });
-
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-
-    if (menuToggle && sidebar) {
-      menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
+      
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && sidebar) {
+          sidebar.classList.remove('open');
+        }
       });
     }
+  }
 
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 768 &&
-        sidebar && !sidebar.contains(e.target) &&
-        menuToggle && !menuToggle.contains(e.target) &&
-        sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-      }
-    });
+  // --- 2. Main Execution on Page Load ---
+  document.addEventListener('DOMContentLoaded', () => {
+    const game = new GameState();
 
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 768 && sidebar) {
-        sidebar.classList.remove('open');
+    // Core logic: handle effects only on the first visit to a page.
+    if (pageId && !game.visited.has(pageId)) {
+      console.log(`First visit to ${pageId}. Processing effects.`);
+      game.visited.add(pageId);
+      game.saveVisited();
+      game.processPageEffects(pageId);
+    }
+
+    // SPECIAL CASE: Check for Bird Room closet key on EVERY visit to Bird Room
+    if (pageId === 'birdroom' && game.inventory.includes('closet_key')) {
+      const pre1Page = pages.find(p => p.filename === 'pre1');
+      if (pre1Page && pre1Page.initialLocked) {
+        pre1Page.initialLocked = false;
+        localStorage.setItem(`locked_pre1`, "false");
+        console.log("Bird Room key check: unlocking closet!");
+        game.showEventBox([`PrE - 1 unlocked! You can now access the Bird Room closet with your key.`]);
       }
-    });
+    }
+
+    // Update all UI elements and set up listeners with the fully loaded state.
+    game.updateAllUI();
+    game.setupEventListeners();
+
+    // --- Debug Logging ---
+    console.log("Time reached zero:", game.timeReachedZero);
+    console.log("Exam unlocked:", game.examUnlocked);
+    
+    if (pageId === 'angiewells') {
+      console.log('--- Angie Wells Debug ---');
+      console.log('Is first visit?', !game.visited.has(pageId)); 
+      console.log('Current inventory:', JSON.stringify(game.inventory));
+      console.log('Current visited pages:', JSON.stringify([...game.visited]));
+      console.log('--- End Debug ---');
+    }
   });
 </script>

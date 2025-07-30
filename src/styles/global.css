@@ -52,6 +52,7 @@ p {
   display: flex;
   justify-content: center;
   align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .banner span {
@@ -174,7 +175,7 @@ p {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  color: white;
+  color: rgb(233, 232, 232);
   position: relative;
 }
 
@@ -199,7 +200,7 @@ p {
 }
 
 .landing-page .logo {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 1.5rem;
   color: white;
   text-decoration: none;
@@ -234,21 +235,22 @@ p {
 }
 
 .landing-page h1 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 2.8rem;
   text-align: center;
   margin-bottom: 1rem;
-  color: #fff;
+  color: #f8f8f8;
   text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
 }
 
 .landing-page p.intro {
+  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   font-size: 1.15rem;
   max-width: 700px;
   margin: 0 auto 3rem;
   line-height: 1.6;
-  color: #e0e0e0;
+  color: #c7c7c7;
 }
 
 .landing-page .case-container {

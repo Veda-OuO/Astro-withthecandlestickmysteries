@@ -1,4 +1,5 @@
 ---
+// filepath: c:\Users\gregw\retrograde-meridian\src\pages\rules.astro
 // src/pages/rules.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
@@ -138,43 +139,35 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Solve Case button
-    const solveCaseButton = document.getElementById('solveCase');
-    if (solveCaseButton) {
-      solveCaseButton.addEventListener('click', () => {
-        if (confirm('Are you sure you want to solve the case now? This will prevent you from exploring further leads and take you straight to the exam page.')) {
-          // Set the flags for time reached zero and exam unlocked but don't change the counter
-          localStorage.setItem("timeReachedZero", "true");
-          localStorage.setItem("examUnlocked", "true");
-          
-          // Show confirmation
-          alert('The Exam is now unlocked. You can proceed to submit your answers.');
-          
-          // Reload the page to apply changes
-          window.location.reload();
-        }
-      });
-    }
-    
-    // Reset Case button
-    const resetCaseButton = document.getElementById('resetCase');
-    if (resetCaseButton) {
-      resetCaseButton.addEventListener('click', () => {
-        if (confirm('Are you sure you want to reset this case? All your progress will be lost.')) {
-          // Clear localStorage
-          localStorage.clear();
-          
-          // Clear sessionStorage
-          sessionStorage.clear();
-          
-          // Show feedback
-          alert('Case has been reset. The page will now reload.');
-          
-          // Reload the page to apply the reset
-          window.location.reload();
-        }
-      });
-    }
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  const solveCaseButton = document.getElementById('solveCase');
+  if (solveCaseButton) {
+    solveCaseButton.addEventListener('click', () => {
+      if (confirm('Are you sure you want to solve the case now? This will prevent you from exploring further leads and take you straight to the exam page.')) {
+        // Set the flags for time reached zero and exam unlocked but don't change the counter
+        localStorage.setItem("timeReachedZero", "true");
+        localStorage.setItem("examUnlocked", "true");
+        
+        // Show confirmation
+        alert('The Exam is now unlocked. You can proceed to submit your answers.');
+        
+        // Reload the page to apply changes
+        window.location.reload();
+      }
+    });
+  }
+  
+  const resetCaseButton = document.getElementById('resetCase');
+  if (resetCaseButton) {
+    resetCaseButton.addEventListener('click', () => {
+      if (confirm('Are you sure you want to reset this case? All your progress will be lost.')) {
+        // Clear all game progress from storage directly
+        localStorage.clear();
+        
+        // Navigate to the introduction page to start fresh
+        window.location.href = '/intro';
+      }
+    });
+  }
+});
 </script>
