@@ -1,76 +1,253 @@
 ---
-import '../styles/global.css'; // ADD THIS LINE
+// filepath: c:\Users\gregw\retrograde-meridian\src\layouts\LandingLayout.astro
 export interface Props {
   title: string;
   description: string;
+  backgroundImage?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, backgroundImage = '/assets/landing-bg.jpg' } = Astro.props;
 ---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="google-site-verification" content="xPeNBF9dFYi7idzNjBgfMS8QxvrRusR0Doodp_K36sY" />
-  
-  <title>{title}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:title" content="With the Candlestick Mysteries" />
-  <meta property="og:description" content="Play a mystery game. Solve cases. Interview suspects. Can you uncover the truth?" />
-  <meta property="og:image" content="/assets/preview.jpg" />
-  <meta property="og:url" content="https://withthecandlestickmysteries.com/" />
-  <meta property="og:type" content="website" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title}</title>
   
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <!-- Favicon Image -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-65QXKQK4RX"></script>
-  <script is:inline>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-65QXKQK4RX');
-  </script>
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
 </head>
 <body class="landing-page">
-  <!-- Header -->
+  <div class="background-container" style={`background-image: url(${backgroundImage});`}></div>
+  
   <header>
-    <a class="logo" href="/"> WithTheCandlestick Mysteries - A Literary Investigation Game </a>
-    <div class="menu-toggle">☰</div>
     <nav>
-      <a href="/">Home</a>
-      <a href="/rules">Newest Case</a>
-      <a href="/contact">Contact</a>
+      <a href="/" class="logo">With the Candlestick</a>
+      <div class="nav-links">
+        <a href="/contact">Contact</a>
+      </div>
+      <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+        <span class="hamburger"></span>
+      </button>
     </nav>
   </header>
 
-  <!-- Main Content Slot -->
   <main>
     <slot />
   </main>
 
+  <footer>
+    <p>&copy; {new Date().getFullYear()} With the Candlestick Mysteries. All rights reserved.</p>
+  </footer>
+
   <script>
-    // Simple menu toggle script
-    const menuToggle = document.querySelector('.landing-page .menu-toggle');
-    if (menuToggle) {
-      menuToggle.addEventListener('click', () => {
-        const nav = document.querySelector('.landing-page nav');
-        if (nav) {
-          nav.classList.toggle('active');
-        }
-      });
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuToggle = document.getElementById('menu-toggle');
+      const navLinks = document.querySelector('.nav-links');
+
+      if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+          navLinks.classList.toggle('active');
+          menuToggle.classList.toggle('active');
+        });
+      }
+    });
   </script>
+
+  <style is:global>
+    /* --- General Layout & Background --- */
+    .landing-page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: #f0f0f0;
+      position: relative;
+      margin: 0;
+      padding: 0;
+    }
+
+    .background-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: -2;
+    }
+
+    .background-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.65);
+      z-index: -1;
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 80px 1rem 2rem;
+    }
+
+    /* --- Header & Navigation --- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+      height: 60px;
+    }
+
+    .logo {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-decoration: none;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      color: #f0f0f0;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #ffc107;
+    }
+
+    /* --- Mobile Menu --- */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .hamburger {
+      display: block;
+      position: relative;
+      width: 25px;
+      height: 2px;
+      background: white;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .hamburger::before,
+    .hamburger::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: white;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .hamburger::before { top: -8px; }
+    .hamburger::after { bottom: -8px; }
+
+    .menu-toggle.active .hamburger {
+      transform: rotate(45deg);
+    }
+    .menu-toggle.active .hamburger::before {
+      transform: rotate(90deg);
+      top: 0;
+    }
+    .menu-toggle.active .hamburger::after {
+      transform: rotate(90deg);
+      bottom: 0;
+      opacity: 0;
+    }
+
+    /* --- Footer --- */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(10, 10, 10, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    /* --- Responsive Styles --- */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        max-width: 300px;
+        height: 100vh;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        transition: right 0.4s ease-in-out;
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links a {
+        font-size: 1.5rem;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      main {
+        padding: 100px 1rem 1rem; /* Increased from 70px to 100px */
+      }
+    }
+
+    @media (max-width: 480px) {
+      main {
+        padding: 90px 0.5rem 1rem; /* Increased from 60px to 90px */
+      }
+      
+      .logo {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
 </body>
 </html>

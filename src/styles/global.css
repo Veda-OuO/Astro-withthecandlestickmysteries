@@ -169,7 +169,7 @@ p {
    Scoped Landing Page Styles
    ========================================================================== */
 
-.landing-page {
+/* .landing-page {
   font-family: 'Inter', sans-serif;
   background-image: url('/assets/rules.jpg');
   background-size: cover;
@@ -280,7 +280,7 @@ p {
   width: 100%;
   display: block;
   border-radius: 12px;
-}
+} */
 /* ==========================================================================
    Game Page Main Content Area
    ========================================================================== */
