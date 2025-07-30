@@ -7,7 +7,7 @@ export interface Props {
 }
 
 const baseUrl = import.meta.env.BASE_URL;
-const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` } = Astro.props;
+const { title, description, backgroundImage = `${baseUrl}/assets/landing-bg.jpg` } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -28,9 +28,9 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
   
   <header>
     <nav>
-      <a href={baseUrl} class="logo">With the Candlestick</a>
+      <a href={baseUrl || '/'} class="logo">With the Candlestick</a>
       <div class="nav-links">
-        <a href={`${baseUrl}contact`}>Contact</a>
+        <a href={`${baseUrl}/contact`}>Contact</a>
       </div>
       <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
         <span class="hamburger"></span>
@@ -61,7 +61,6 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
   </script>
 
   <style is:global>
-    /* --- General Layout & Background --- */
     .landing-page {
       display: flex;
       flex-direction: column;
@@ -100,7 +99,6 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
       padding: 80px 1rem 2rem;
     }
 
-    /* --- Header & Navigation --- */
     header {
       position: fixed;
       top: 0;
@@ -149,7 +147,6 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
       color: #ffc107;
     }
 
-    /* --- Mobile Menu --- */
     .menu-toggle {
       display: none;
       background: none;
@@ -181,20 +178,10 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
     .hamburger::before { top: -8px; }
     .hamburger::after { bottom: -8px; }
 
-    .menu-toggle.active .hamburger {
-      transform: rotate(45deg);
-    }
-    .menu-toggle.active .hamburger::before {
-      transform: rotate(90deg);
-      top: 0;
-    }
-    .menu-toggle.active .hamburger::after {
-      transform: rotate(90deg);
-      bottom: 0;
-      opacity: 0;
-    }
+    .menu-toggle.active .hamburger { transform: rotate(45deg); }
+    .menu-toggle.active .hamburger::before { transform: rotate(90deg); top: 0; }
+    .menu-toggle.active .hamburger::after { transform: rotate(90deg); bottom: 0; opacity: 0; }
 
-    /* --- Footer --- */
     footer {
       text-align: center;
       padding: 1.5rem;
@@ -204,7 +191,6 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
       color: #aaa;
     }
 
-    /* --- Responsive Styles --- */
     @media (max-width: 768px) {
       .nav-links {
         position: fixed;
@@ -222,32 +208,15 @@ const { title, description, backgroundImage = `${baseUrl}assets/landing-bg.jpg` 
         gap: 2rem;
         transition: right 0.4s ease-in-out;
       }
-
-      .nav-links.active {
-        right: 0;
-      }
-
-      .nav-links a {
-        font-size: 1.5rem;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      main {
-        padding: 100px 1rem 1rem; /* Increased from 70px to 100px */
-      }
+      .nav-links.active { right: 0; }
+      .nav-links a { font-size: 1.5rem; }
+      .menu-toggle { display: block; }
+      main { padding: 100px 1rem 1rem; }
     }
 
     @media (max-width: 480px) {
-      main {
-        padding: 90px 0.5rem 1rem; /* Increased from 60px to 90px */
-      }
-      
-      .logo {
-        font-size: 1.2rem;
-      }
+      main { padding: 90px 0.5rem 1rem; }
+      .logo { font-size: 1.2rem;}
     }
   </style>
 </body>

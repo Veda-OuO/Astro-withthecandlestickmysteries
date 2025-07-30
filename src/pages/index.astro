@@ -7,7 +7,7 @@ const baseUrl = import.meta.env.BASE_URL;
 <LandingLayout 
   title="Interactive Mystery Game | With the Candlestick Mysteries"
   description="Play With the Candlestick Mysteries – an interactive detective game where you lead your own investigation. Choose which suspects to interrogate and where to search for clues as you race to crack the case and solve the mystery before time runs out."
-  backgroundImage={`${baseUrl}assets/rules.jpg`}
+  backgroundImage={`${baseUrl}/assets/rules.jpg`}
 >
   <h1>Case Files</h1>
   <p class="intro">
@@ -16,37 +16,37 @@ const baseUrl = import.meta.env.BASE_URL;
 
   <section class="case-container">
     <div class="case-box">
-      <a href={`${baseUrl}rules`} aria-label="Open Case 1: Where's Wesley">
-        <img loading="lazy" src={`${baseUrl}assets/Folder-Where'sWesley.png`} alt="Case 1: Where's Wesley" class="case-image">
+      <a href={`${baseUrl}/rules`} aria-label="Open Case 1: Where's Wesley">
+        <img loading="lazy" src={`${baseUrl}/assets/Folder-Where'sWesley.png`} alt="Case 1: Where's Wesley" class="case-image">
       </a>
     </div>
     <div class="case-box">
       <a href="#" aria-label="Case 2: Whispering Walls (Coming Soon)">
-        <img loading="lazy" src={`${baseUrl}assets/Folder-Blank.png`} alt="Case 2: Whispering Walls" class="case-image">
+        <img loading="lazy" src={`${baseUrl}/assets/Folder-Blank.png`} alt="Case 2: Whispering Walls" class="case-image">
         <span class="coming-soon-tag">Coming Soon</span>
       </a>
     </div>
     <div class="case-box">
       <a href="#" aria-label="Case 3: Candlelight Intrigue (Coming Soon)">
-        <img loading="lazy" src={`${baseUrl}assets/Folder-Blank.png`} alt="Case 3: Candlelight Intrigue" class="case-image">
+        <img loading="lazy" src={`${baseUrl}/assets/Folder-Blank.png`} alt="Case 3: Candlelight Intrigue" class="case-image">
         <span class="coming-soon-tag">Coming Soon</span>
       </a>
     </div>
     <div class="case-box">
       <a href="#" aria-label="Case 4: Mystery Case (Coming Soon)">
-        <img loading="lazy" src={`${baseUrl}assets/Folder-Blank.png`} alt="Case 4: Mystery Case" class="case-image">
+        <img loading="lazy" src={`${baseUrl}/assets/Folder-Blank.png`} alt="Case 4: Mystery Case" class="case-image">
         <span class="coming-soon-tag">Coming Soon</span>
       </a>
     </div>
     <div class="case-box">
       <a href="#" aria-label="Case 5: Another Mystery (Coming Soon)">
-        <img loading="lazy" src={`${baseUrl}assets/Folder-Blank.png`} alt="Case 5: Another Mystery" class="case-image">
+        <img loading="lazy" src={`${baseUrl}/assets/Folder-Blank.png`} alt="Case 5: Another Mystery" class="case-image">
         <span class="coming-soon-tag">Coming Soon</span>
       </a>
     </div>
     <div class="case-box">
       <a href="#" aria-label="Case 6: Final Case (Coming Soon)">
-        <img loading="lazy" src={`${baseUrl}assets/Folder-Blank.png`} alt="Case 6: Final Case" class="case-image">
+        <img loading="lazy" src={`${baseUrl}/assets/Folder-Blank.png`} alt="Case 6: Final Case" class="case-image">
         <span class="coming-soon-tag">Coming Soon</span>
       </a>
     </div>
@@ -84,7 +84,7 @@ const baseUrl = import.meta.env.BASE_URL;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    max-width: 900px; /* Reduced from 1000px */
+    max-width: 900px;
     margin: 0 auto 4rem;
     padding: 0 1rem;
   }
@@ -95,8 +95,8 @@ const baseUrl = import.meta.env.BASE_URL;
     border-radius: 8px;
     overflow: hidden;
     width: 100%;
-    max-width: 280px; /* Constrain maximum width */
-    margin: 0 auto; /* Center boxes within grid cells */
+    max-width: 280px;
+    margin: 0 auto;
   }
 
   .case-box:hover {
@@ -117,7 +117,6 @@ const baseUrl = import.meta.env.BASE_URL;
     display: block;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    /* Ensure the entire image is visible */
     object-fit: contain;
     background-color: transparent;
   }
@@ -147,7 +146,6 @@ const baseUrl = import.meta.env.BASE_URL;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
-  /* Tablet Styles */
   @media (max-width: 900px) {
     .case-container {
       grid-template-columns: repeat(2, 1fr);
@@ -155,53 +153,21 @@ const baseUrl = import.meta.env.BASE_URL;
       padding: 0 2rem;
       max-width: 600px;
     }
-
-    .case-box {
-      max-width: 250px;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      padding: 0 1rem;
-    }
-
-    .intro {
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-      padding: 0 1.5rem;
-    }
+    .case-box { max-width: 250px; }
+    h1 { font-size: 2.5rem; padding: 0 1rem; }
+    .intro { font-size: 1.1rem; margin-bottom: 2rem; padding: 0 1.5rem; }
   }
 
-  /* Mobile Styles */
   @media (max-width: 600px) {
     .case-container {
       grid-template-columns: 1fr;
       gap: 1.5rem;
       max-width: 320px;
     }
-
-    .case-box {
-      max-width: 280px;
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-top: 1rem;
-    }
-
-    .intro {
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-    }
-
-    .case-box:hover {
-      transform: translateY(-5px);
-    }
-    
-    .coming-soon-tag {
-      font-size: 0.7rem;
-      padding: 4px 8px;
-    }
+    .case-box { max-width: 280px; }
+    h1 { font-size: 2rem; margin-top: 1rem; }
+    .intro { font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    .case-box:hover { transform: translateY(-5px); }
+    .coming-soon-tag { font-size: 0.7rem; padding: 4px 8px; }
   }
 </style>
