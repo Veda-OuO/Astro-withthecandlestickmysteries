@@ -4,11 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Ivory Suite" pageId="ivorysuite">
-  <style>
-    body {
-      --page-background-image: url('/assets/ivorysuite.jpg');
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/ivorysuite.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">Ivory Suite</div>
   <div class="text-box">
@@ -30,7 +35,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
   
   <div class="bottom-image">
-    <img src="/assets/ISNote.jpg" alt="Evidence image">
+    <img src="/Astro-withthecandlestickmysteries/assets/ISNote.jpg" alt="Evidence image">
   </div>
 </BaseLayout>
 

@@ -4,11 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Winter Suite" pageId="7p">
-  <style>
-    body {
-      --page-background-image: url('/assets/wintersuite.jpg');
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/wintersuite.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">Winter Suite</div>
   <div class="text-box">

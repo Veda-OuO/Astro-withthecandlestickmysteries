@@ -4,11 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Introduction" pageId="intro">
-  <style>
-    body {
-      --page-background-image: url('/assets/mainentry1.jpg');
-    }
-  </style>
+ <style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/mainentry1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">Introduction</div>
   <div class="text-box">
@@ -108,7 +113,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
   
   <div class="bottom-image">
-    <img src="/assets/IntroNote.jpg" alt="Evidence image" class="bottom-image-style">
+    <img src="/Astro-withthecandlestickmysteries/assets/IntroNote.jpg" alt="Evidence image" class="bottom-image-style">
   </div>
 </BaseLayout>
 

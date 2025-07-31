@@ -2,6 +2,7 @@
 // filepath: c:\Users\gregw\retrograde-meridian\src\layouts\BaseLayout.astro
 import Sidebar from '../components/Sidebar.astro';
 import VisitTracker from '../components/VisitTracker.astro';
+import '../styles/global.css';
 
 export interface Props {
   title: string;
@@ -31,7 +32,6 @@ const baseUrl = import.meta.env.BASE_URL;
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href={`${baseUrl}/styles/global.css`}>
 </head>
 <body>
   <div class="banner">
@@ -43,7 +43,7 @@ const baseUrl = import.meta.env.BASE_URL;
   <button class="menu-toggle" id="menuToggle">☰ Menu</button>
   
   <div class="container">
-    <Sidebar currentPageId={pageId} />
+    <Sidebar pageId={pageId} />
     <main class="main-content">
       <slot />
     </main>

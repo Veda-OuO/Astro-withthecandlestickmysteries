@@ -1,12 +1,18 @@
 ---
 // src/pages/daledawson.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
+// const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout title="Dale Dawson" pageId="daledawson">
-  <style>
+  <style is:global>
     body {
-      --page-background-image: url('/assets/broom.jpg');
+      background-image: url('/Astro-withthecandlestickmysteries/assets/broom.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
     }
   </style>
 

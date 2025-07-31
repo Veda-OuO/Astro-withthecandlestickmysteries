@@ -4,16 +4,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="War Room" pageId="warroom">
-  <style>
-    body {
-      --page-background-image: url('/assets/warroom.jpg');
-    }
-    
-    .secondary-text-box {
-      margin-top: 20px;
-      max-height: 300px;
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/warroom.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
+
 
   <div class="title">War Room</div>
   <div class="text-box">
@@ -39,7 +40,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
 
   <div class="bottom-image">
-    <img src="/assets/WRNote.jpg" alt="Evidence image">
+    <img src="/Astro-withthecandlestickmysteries/assets/WRNote.jpg" alt="Evidence image">
   </div>
 
   <div class="text-box secondary-text-box">

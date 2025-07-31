@@ -4,12 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Notes" pageId="notes">
-  <style>
-    body {
-      --page-background-image: url('/assets/exam1.jpg');
-    }
-  </style>
-  
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/exam1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
   <div class="title">Notes</div>
   
   <div class="notes-container">

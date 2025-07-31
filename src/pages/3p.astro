@@ -4,15 +4,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="3 - P" pageId="3p">
-  <style>
-    body {
-      --page-background-image: url('/assets/aflanders.jpg');
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/3p.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">3 - P</div>
   <div class="text-box">
-    <p>The servants&rsquo; rooms were at the end of a dark, lonely wing on the first floor&ndash; far away from the action in the main entry.</p>
+    <p>The servants&rsquo; rooms were at the end of a lonely wing on the first floor&ndash; far away from the action in the main entry.</p>
     <p>&nbsp;</p>
     <p>Walking softly, I approached the door labeled &ldquo;3 - P&rdquo; in an attempt to search Flora&rsquo;s room. I heard the sound of a young woman crying inside.</p>
     <p>&nbsp;</p>

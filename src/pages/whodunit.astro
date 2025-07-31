@@ -4,11 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Whodunit" pageId="whodunit">
-  <style>
-    body {
-      --page-background-image: url('/assets/rules.jpg');
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/rules.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">Whodunit</div>
   <div class="text-box">

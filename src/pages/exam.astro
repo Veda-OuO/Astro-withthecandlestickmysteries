@@ -6,11 +6,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout title="Exam" pageId="exam">
   <div class="title">Exam</div>
 
-  <style>
-    body {
-      --page-background-image: url('/assets/rules.jpg');
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/exam.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
   <div class="text-box">
     <p><strong>Exam Rules:</strong></p>
     <p>&nbsp;</p>

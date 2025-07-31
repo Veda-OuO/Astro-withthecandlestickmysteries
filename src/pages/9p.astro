@@ -4,11 +4,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Master Bedroom" pageId="9p">
-  <style>
-    body {
-      --page-background-image: url('/assets/9b.jpg');
-    }
-  </style>
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/9b.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">9 - P</div>
   <div class="text-box">
@@ -28,7 +33,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
   
   <div class="bottom-image">
-    <img src="/assets/9pNote.jpg" alt="Evidence image">
+    <img src="/Astro-withthecandlestickmysteries/assets/9pNote.jpg" alt="Evidence image">
   </div>
 </BaseLayout>
 

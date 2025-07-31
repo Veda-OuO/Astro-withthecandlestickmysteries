@@ -4,11 +4,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Miss Flora" pageId="missflora">
-  <style>
-    body {
-      --page-background-image: url('/assets/mflora.jpg');
-    }
-  </style>
+
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/mflora.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
 
   <div class="title">Miss Flora</div>
   <div class="text-box">
@@ -62,7 +68,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   </div>
   
   <div class="bottom-image">
-    <img src="/assets/FloraNote.jpg" alt="Evidence image" class="bottom-image-style">
+    <img src="/Astro-withthecandlestickmysteries/assets/FloraNote.jpg" alt="Evidence image" class="bottom-image-style">
   </div>
 </BaseLayout>
 

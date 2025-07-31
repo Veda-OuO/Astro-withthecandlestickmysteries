@@ -4,10 +4,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Billiard Room" pageId="billiardroom">
-  <style>
-    body {
-      --page-background-image: url('/assets/broom.jpg');
-    }
+
+
+  <style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/broom.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
   </style>
 
   <div class="title">Billiard Room</div>

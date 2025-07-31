@@ -4,12 +4,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Marla Barton" pageId="marlabarton">
-  <style>
-    body {
-      --page-background-image: url('/assets/mbarton.jpg');
-    }
-  </style>
 
+<style is:global>
+  body {
+    background-image: url('/Astro-withthecandlestickmysteries/assets/mbarton.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+</style>
   <div class="title">Marla Barton</div>
   <div class="text-box">
     <p>I caught Marla just in time to ask her a few questions.&nbsp;</p>
