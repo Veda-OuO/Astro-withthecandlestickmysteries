@@ -1,28 +1,29 @@
-// src/data/pages.js
-
-// lock/unlock sytax:     unlocksOnVisit: ['9p', '7p'], locksOnVisit: ['12c', '9a']
+const baseUrl = import.meta.env.BASE_URL;
 
 // A dictionary of all possible inventory items in the game.
 // Each item now has a name for display and a path to its image.
 export const items = {
   closet_key2: { 
     name: "Shattered Dragon Figurine",
-    image: "/assets/items/key3.jpg" 
+    image: `${baseUrl}/assets/items/key3.jpg` 
   },
   closet_key: {
     name: "Small Iron Key",
-    image: "/assets/items/key.jpg"
+    image: `${baseUrl}/assets/items/key.jpg`
   },
     closet_key3: {
     name: "Smallss Iron Key",
-    image: "/assets/items/key3.jpg"
+    image: `${baseUrl}/assets/items/key3.jpg`
   },
   // Add other item IDs and their data here
 };
 
 export const pages = [
   { type: 'link', filename: 'notes', title: 'Notes', counted: false},
-  { type: 'link', filename: 'rules', title: 'Rules', counted: false},
+  { type: 'link', filename: 'rules', title: 'Rules', counted: false },
+  { type: 'link', filename: 'exam', title: 'Exam', counted: false, initialLocked: true },
+  { type: 'link', filename: 'whodunit', title: 'Whodunit', counted: false, initialLocked: true },
+  { type: 'category', title: 'Case File' },
   { type: 'link', filename: 'intro', title: 'Introduction', counted: false},
   { type: 'category', title: 'People' },
   { type: 'link', filename: 'fredwells', title: 'Fred Wells' },
@@ -52,8 +53,5 @@ export const pages = [
   { type: 'link', filename: '4a', title: '4 - A', initialLocked: true },
   { type: 'link', filename: '10b', title: '10 - B', initialLocked: true },
   { type: 'link', filename: '11a', title: '11 - A', initialLocked: true },
-  { type: 'category', title: 'Items' },
-  { type: 'link', filename: 'pre1', title: 'PrE - 1', counted: false, initialLocked: true, requiresItem: 'closet_key' },
-  { type: 'link', filename: 'exam', title: 'Exam', special: true, counted: false, initialLocked: true },
-  { type: 'link', filename: 'whodunit', title: 'Whodunit', special1: true, counted: false, initialLocked: true },
+  { type: 'link', filename: 'pre1', title: 'PrE - 1', initialLocked: true, requiresItem: 'closet_key' },
 ];

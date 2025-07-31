@@ -10,7 +10,10 @@ const { pageId } = Astro.props;
 ---
 
 <script define:vars={{ pageId, pages, items }}>
-  // --- 1. State Management Class ---
+  // This script now correctly receives item data with full paths from pages.js
+  // and relies on the corrected href attributes from Sidebar.astro for navigation.
+  // No direct path changes are needed within this script itself.
+
   class GameState {
     constructor() {
       this.visited = new Set();
@@ -45,27 +48,20 @@ const { pageId } = Astro.props;
       }
     }
 
-    saveVisited() {
-      localStorage.setItem("visitedPages", JSON.stringify([...this.visited]));
-    }
-
-    saveInventory() {
-      localStorage.setItem("inventory", JSON.stringify(this.inventory));
-    }
+    saveVisited() { localStorage.setItem("visitedPages", JSON.stringify([...this.visited])); }
+    saveInventory() { localStorage.setItem("inventory", JSON.stringify(this.inventory)); }
 
     processPageEffects(pageId) {
       const currentPage = pages.find(p => p.filename === pageId);
       if (!currentPage) return;
       let eventMessages = [];
 
-      // Handle single item addition
       if (currentPage.addsItem) {
         this.inventory.push(currentPage.addsItem);
         this.saveInventory();
         eventMessages.push(`Item added: ${items[currentPage.addsItem].name}`);
       }
       
-      // Handle multiple items
       if (currentPage.addsItems && Array.isArray(currentPage.addsItems)) {
         currentPage.addsItems.forEach(itemId => {
           this.inventory.push(itemId);
@@ -74,17 +70,13 @@ const { pageId } = Astro.props;
         this.saveInventory();
       }
 
-      // Handle removing items
       if (currentPage.removesItem && this.inventory.includes(currentPage.removesItem)) {
         const index = this.inventory.indexOf(currentPage.removesItem);
-        if (index > -1) {
-          this.inventory.splice(index, 1);
-        }
+        if (index > -1) this.inventory.splice(index, 1);
         this.saveInventory();
         eventMessages.push(`Item used: ${items[currentPage.removesItem].name}`);
       }
 
-      // Handle unlocking pages
       if (currentPage.unlocksOnVisit) {
         currentPage.unlocksOnVisit.forEach(filename => {
           const pageToUnlock = pages.find(p => p.filename === filename);
@@ -96,7 +88,6 @@ const { pageId } = Astro.props;
         });
       }
 
-      // Handle locking pages
       if (currentPage.locksOnVisit) {
         currentPage.locksOnVisit.forEach(filename => {
           const pageToLock = pages.find(p => p.filename === filename);
@@ -108,7 +99,6 @@ const { pageId } = Astro.props;
         });
       }
 
-      // Special case for Bird Room: Check if we have the key to unlock the closet
       if (pageId === 'birdroom' && this.inventory.includes('closet_key')) {
         const pre1Page = pages.find(p => p.filename === 'pre1');
         if (pre1Page && pre1Page.initialLocked) {
@@ -123,48 +113,27 @@ const { pageId } = Astro.props;
       }
     }
 
-    // Method to lock all unvisited rooms when time runs out
     lockUnvisitedRooms() {
-      // Critical pages that should never be locked
       const criticalPages = ['notes', 'rules', 'intro', 'exam', 'whodunit'];
-      
-      // Find all content pages that haven't been visited
       pages.forEach(page => {
-        if (page.type === 'link' && 
-            !this.visited.has(page.filename) && 
-            !criticalPages.includes(page.filename)) {
-          
-          // Lock this unvisited page
+        if (page.type === 'link' && !this.visited.has(page.filename) && !criticalPages.includes(page.filename)) {
           page.initialLocked = true;
           localStorage.setItem(`locked_${page.filename}`, "true");
-          console.log(`Locking unvisited page: ${page.title}`);
         }
       });
-      
-      console.log("Time's up! Locked all unvisited rooms and unlocked exam.");
     }
 
     shouldTabBeLocked(filename) {
-      // Critical pages that should never be locked
       const neverLockPages = ['notes', 'rules', 'intro'];
       if (neverLockPages.includes(filename)) return false;
-      
-      // Special case for exam - explicitly check if it's unlocked
       if (filename === 'exam') return !this.examUnlocked;
-      
-      // Special case for whodunit - only accessible after exam
       if (filename === 'whodunit') return !this.whodunitUnlocked;
       
       const page = pages.find(p => p.filename === filename);
       if (!page) return false;
       
-      // Check for item requirement
       if (page.requiresItem && !this.inventory.includes(page.requiresItem)) return true;
-      
-      // Check if it's explicitly marked as locked
       if (page.initialLocked === true) return true;
-      
-      // If time has run out, lock any unvisited locations
       if (this.timeReachedZero && !this.visited.has(filename)) return true;
       
       return false;
@@ -185,32 +154,20 @@ const { pageId } = Astro.props;
       const counter = document.getElementById("counter");
       if (counter) counter.textContent = remainingHours;
       
-      // Update counter color based on remaining hours
       const counterElement = counter?.parentElement;
       if (counterElement) {
-        if (remainingHours <= 3) {
-          counterElement.style.backgroundColor = '#ff0000';
-        } else if (remainingHours <= 6) {
-          counterElement.style.backgroundColor = '#ff4500';
-        } else {
-          counterElement.style.backgroundColor = '#8B0000';
-        }
+        if (remainingHours <= 3) counterElement.style.backgroundColor = '#ff0000';
+        else if (remainingHours <= 6) counterElement.style.backgroundColor = '#ff4500';
+        else counterElement.style.backgroundColor = '#8B0000';
       }
       
-      // Handle time reaching zero - UPDATED LOGIC HERE
       if (remainingHours === 0 && !this.timeReachedZero) {
         this.timeReachedZero = true;
         this.examUnlocked = true;
         localStorage.setItem("timeReachedZero", "true");
         localStorage.setItem("examUnlocked", "true");
-        
-        // Show notification to the player
         this.showEventBox(["Investigation time has run out! The Exam tab is now available."]);
-        
-        // Lock unvisited rooms but keep critical navigation accessible
         this.lockUnvisitedRooms();
-        
-        // Make sure link states update
         this.updateLinkStates();
       }
     }
@@ -218,39 +175,27 @@ const { pageId } = Astro.props;
     updateInventoryDisplay() {
       const inventoryGrid = document.getElementById('inventory-grid');
       if (!inventoryGrid) return;
+      inventoryGrid.innerHTML = '';
       
-      inventoryGrid.innerHTML = ''; // Clear current grid
-      
-      // Create a count map of how many of each item we have
       const itemCounts = {};
       this.inventory.forEach(itemId => {
-        if (!itemCounts[itemId]) {
-          itemCounts[itemId] = 0;
-        }
+        if (!itemCounts[itemId]) itemCounts[itemId] = 0;
         itemCounts[itemId]++;
       });
       
-      // Process unique items (by ID)
       Object.keys(itemCounts).forEach(itemId => {
         const itemData = items[itemId];
         const itemCount = itemCounts[itemId];
         
         if (itemData && itemData.image) {
           const itemContainer = document.createElement('div');
-          itemContainer.style.cssText = `
-            padding: 10px 0;
-            width: 100%;
-            text-align: center;
-            position: relative;
-          `;
+          itemContainer.style.cssText = `padding: 10px 0; width: 100%; text-align: center; position: relative;`;
           
-          // Create the image
           const img = document.createElement('img');
-          img.src = itemData.image;
+          img.src = itemData.image; // This now uses the corrected full path from pages.js
           img.alt = itemData.name;
           img.className = 'inventory-item';
           
-          // Apply direct inline sizing
           img.style.maxWidth = '120px';
           img.style.maxHeight = '120px';
           img.style.width = 'auto';
@@ -258,34 +203,15 @@ const { pageId } = Astro.props;
           img.style.margin = '15px auto';
           img.style.display = 'block';
           
-          // Add the count badge if more than 1
           if (itemCount > 1) {
             const countBadge = document.createElement('div');
             countBadge.textContent = itemCount;
-            countBadge.style.cssText = `
-              position: absolute;
-              bottom: 35px;
-              right: calc(50% - 50px);
-              background-color: rgba(0, 0, 0, 0.7);
-              color: white;
-              font-weight: bold;
-              min-width: 30px;
-              height: 30px;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 14px;
-              border: 2px solid white;
-              box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
-            `;
-            
+            countBadge.style.cssText = `position: absolute; bottom: 35px; right: calc(50% - 50px); background-color: rgba(0, 0, 0, 0.7); color: white; font-weight: bold; min-width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid white; box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);`;
             itemContainer.appendChild(img);
             itemContainer.appendChild(countBadge);
           } else {
             itemContainer.appendChild(img);
           }
-          
           inventoryGrid.appendChild(itemContainer);
         }
       });
@@ -297,17 +223,12 @@ const { pageId } = Astro.props;
         const filename = link.getAttribute('data-filename');
         if (!filename) return;
         
-        // Clear existing states
         link.classList.remove('visited', 'locked');
         const existingLock = link.querySelector('.lock-icon');
         if (existingLock) existingLock.remove();
 
-        // Apply visited class
-        if (this.visited.has(filename)) {
-          link.classList.add('visited');
-        }
+        if (this.visited.has(filename)) link.classList.add('visited');
         
-        // Apply lock if needed
         if (this.shouldTabBeLocked(filename)) {
           link.classList.add('locked');
           const lockIcon = document.createElement('span');
@@ -320,76 +241,34 @@ const { pageId } = Astro.props;
     }
     
     showEventBox(messages) {
-      const mainElement = document.querySelector('.main');
+      const mainElement = document.querySelector('.main-content');
       if (!mainElement) return;
       
       const firstTextBox = mainElement.querySelector('.text-box');
-      
       const eventBox = document.createElement('div');
       eventBox.className = 'event-box';
-      eventBox.innerHTML = `
-        <h3>Events</h3>
-        <ul>
-          ${messages.map(msg => `<li>${msg}</li>`).join('')}
-        </ul>
-        <button class="close-event-box">Close</button>
-      `;
+      eventBox.innerHTML = `<h3>Events</h3><ul>${messages.map(msg => `<li>${msg}</li>`).join('')}</ul><button class="close-event-box">Close</button>`;
+      eventBox.style.cssText = `background-color: rgba(139, 0, 0, 0.9); color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; position: relative; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); border: 2px solid #ff6b6b; animation: fadeIn 0.5s;`;
       
-      // Add styles inline to ensure they're applied
-      eventBox.style.cssText = `
-        background-color: rgba(139, 0, 0, 0.9);
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        position: relative;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        border: 2px solid #ff6b6b;
-        animation: fadeIn 0.5s;
-      `;
-      
-      // Style for the close button
       const closeButton = eventBox.querySelector('.close-event-box');
-      closeButton.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: transparent;
-        color: white;
-        border: 1px solid white;
-        border-radius: 4px;
-        padding: 4px 8px;
-        cursor: pointer;
-        font-size: 12px;
-      `;
+      closeButton.style.cssText = `position: absolute; top: 10px; right: 10px; background-color: transparent; color: white; border: 1px solid white; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px;`;
       
-      // Insert the event box before the first text box
-      if (firstTextBox) {
-        firstTextBox.parentNode.insertBefore(eventBox, firstTextBox);
-      } else {
-        mainElement.prepend(eventBox);
-      }
+      if (firstTextBox) firstTextBox.parentNode.insertBefore(eventBox, firstTextBox);
+      else mainElement.prepend(eventBox);
       
-      // Add event listener for the close button
       closeButton.addEventListener('click', () => {
         eventBox.style.animation = 'fadeOut 0.5s';
-        setTimeout(() => {
-          if (eventBox.parentNode) {
-            eventBox.remove();
-          }
-        }, 500);
+        setTimeout(() => { if (eventBox.parentNode) eventBox.remove(); }, 500);
       });
     }
 
     setupEventListeners() {
-      // Exam completion listener
       window.addEventListener('examCompleted', () => {
         this.whodunitUnlocked = true;
         localStorage.setItem('whodunitUnlocked', 'true');
         this.updateLinkStates();
       });
 
-      // Link click listeners
       const links = document.querySelectorAll('.nav-link');
       links.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -406,7 +285,6 @@ const { pageId } = Astro.props;
             return false;
           }
 
-          // Handle sidebar on mobile
           const sidebar = document.getElementById('sidebar');
           if (window.innerWidth <= 768 && sidebar) {
             sidebar.classList.remove('open');
@@ -414,71 +292,45 @@ const { pageId } = Astro.props;
         });
       });
 
-      // Menu toggle for mobile
       const menuToggle = document.getElementById('menuToggle');
       const sidebar = document.getElementById('sidebar');
       if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
-          sidebar.classList.toggle('open');
-        });
+        menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
       }
       
-      // Close sidebar when clicking outside on mobile
       document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768 &&
-          sidebar && !sidebar.contains(e.target) &&
-          menuToggle && !menuToggle.contains(e.target) &&
-          sidebar.classList.contains('open')) {
+        if (window.innerWidth <= 768 && sidebar && !sidebar.contains(e.target) && menuToggle && !menuToggle.contains(e.target) && sidebar.classList.contains('open')) {
           sidebar.classList.remove('open');
         }
       });
       
-      // Handle window resize
       window.addEventListener('resize', () => {
-        if (window.innerWidth > 768 && sidebar) {
-          sidebar.classList.remove('open');
-        }
+        if (window.innerWidth > 768 && sidebar) sidebar.classList.remove('open');
       });
     }
   }
 
-  // --- 2. Main Execution on Page Load ---
   document.addEventListener('DOMContentLoaded', () => {
     const game = new GameState();
 
-    // Core logic: handle effects only on the first visit to a page.
     if (pageId && !game.visited.has(pageId)) {
-      console.log(`First visit to ${pageId}. Processing effects.`);
       game.visited.add(pageId);
       game.saveVisited();
       game.processPageEffects(pageId);
     }
 
-    // SPECIAL CASE: Check for Bird Room closet key on EVERY visit to Bird Room
+
+      //Remove the lock from the Bird Room closet if the player has the key
     if (pageId === 'birdroom' && game.inventory.includes('closet_key')) {
       const pre1Page = pages.find(p => p.filename === 'pre1');
       if (pre1Page && pre1Page.initialLocked) {
         pre1Page.initialLocked = false;
         localStorage.setItem(`locked_pre1`, "false");
-        console.log("Bird Room key check: unlocking closet!");
         game.showEventBox([`PrE - 1 unlocked! You can now access the Bird Room closet with your key.`]);
       }
     }
 
-    // Update all UI elements and set up listeners with the fully loaded state.
-    game.updateAllUI();
+        game.updateAllUI();
     game.setupEventListeners();
-
-    // --- Debug Logging ---
-    console.log("Time reached zero:", game.timeReachedZero);
-    console.log("Exam unlocked:", game.examUnlocked);
-    
-    if (pageId === 'angiewells') {
-      console.log('--- Angie Wells Debug ---');
-      console.log('Is first visit?', !game.visited.has(pageId)); 
-      console.log('Current inventory:', JSON.stringify(game.inventory));
-      console.log('Current visited pages:', JSON.stringify([...game.visited]));
-      console.log('--- End Debug ---');
-    }
   });
 </script>

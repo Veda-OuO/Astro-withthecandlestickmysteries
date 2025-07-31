@@ -1,5 +1,5 @@
 ---
-import '../styles/global.css'; 
+// filepath: c:\Users\gregw\retrograde-meridian\src\layouts\BaseLayout.astro
 import Sidebar from '../components/Sidebar.astro';
 import VisitTracker from '../components/VisitTracker.astro';
 
@@ -9,6 +9,7 @@ export interface Props {
 }
 
 const { title, pageId } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <!DOCTYPE html>
@@ -26,24 +27,28 @@ const { title, pageId } = Astro.props;
     gtag('config', 'G-65QXKQK4RX');
   </script>
   
- <title>With the Candlestick Mysteries</title>
+  <title>{title} | With the Candlestick Mysteries</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href={`${baseUrl}/styles/global.css`}>
 </head>
-<body class="page-background">
+<body>
   <div class="banner">
     <span>Case 1: Where's Wesley</span>
     <div class="banner-buttons">
-      <a href="/" class="home-button">Home</a>
+      <a href={baseUrl || '/'} class="home-button">Home</a>
     </div>
   </div>
   <button class="menu-toggle" id="menuToggle">☰ Menu</button>
   
   <div class="container">
-    <Sidebar />
-    
-    <div class="main" id="main">
-      <VisitTracker pageId={pageId} />
+    <Sidebar currentPageId={pageId} />
+    <main class="main-content">
       <slot />
-    </div>
+    </main>
   </div>
+  
+  <VisitTracker pageId={pageId} />
 </body>
 </html>

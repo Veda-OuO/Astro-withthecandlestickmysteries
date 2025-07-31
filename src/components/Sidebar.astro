@@ -1,11 +1,12 @@
 ---
+// filepath: c:\Users\gregw\retrograde-meridian\src\components\Sidebar.astro
 import { pages } from '../data/pages.js';
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
 <div class="sidebar" id="sidebar">
   <div class="counter">Investigative Hours: <span id="counter">0</span></div>
   
-  <!-- Inventory Section -->
   <div class="inventory-container">
     <div id="inventory-grid" class="inventory-grid">
       <!-- Item images will be dynamically added here -->
@@ -18,15 +19,14 @@ import { pages } from '../data/pages.js';
         return <div class="category">{item.title}</div>;
       } else if (item.type === 'link') {
         const classes = ['nav-link'];
-        if (item.special) classes.push('special');
-        if (item.special1) classes.push('special1');
-        if (item.initialLocked === true) classes.push('locked'); // Add 'locked' class
+        if (item.initialLocked === true) classes.push('locked');
 
         return (
           <a
-            href={`/${item.filename}`}
+            href={`${baseUrl}/${item.filename}`}
             class={classes.join(' ')}
             data-filename={item.filename}
+            id={`link-${item.filename}`}
             data-counted={item.counted !== false ? 'true' : 'false'}
           >
             {item.title}
@@ -37,7 +37,7 @@ import { pages } from '../data/pages.js';
   </div>
 </div>
 
-<style>
+<style define:vars={{ inventoryBg: `${baseUrl}/assets/inventory-bg.jpg` }}>
   .sidebar {
     width: 280px;
     background-color: #111;
@@ -49,9 +49,9 @@ import { pages } from '../data/pages.js';
     left: 0;
     bottom: 0;
     z-index: 999;
-    transition: transform 0.3s ease-in-out; /* Add smooth transition */
+    transition: transform 0.3s ease-in-out;
     display: flex;
-    flex-direction: column; /* Allow for footer at bottom */
+    flex-direction: column;
   }
 
   .counter {
@@ -67,16 +67,13 @@ import { pages } from '../data/pages.js';
     border: 2px solid #ff6b6b;
   }
 
-  /* Inventory Styles - 30% smaller */
   .inventory-container {
     margin-bottom: 20px;
     border-radius: 8px;
     border: 1px solid #444;
-    /* Set a background image for the inventory */
-    background-image: url('/assets/inventory-bg.jpg');
+    background-image: url(var(--inventoryBg));
     background-size: cover;
     background-position: center;
-    /* 30% smaller than original 260px = 182px */
     height: 160px;
     min-height: 160px;
     max-height: 160px;
@@ -93,31 +90,19 @@ import { pages } from '../data/pages.js';
     left: 0;
     height: 100%;
     width: 100%;
-    overflow-y: auto; /* Enable vertical scrolling for items */
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px; /* 30% smaller gap */
-    padding: 14px 0; /* 30% smaller padding */
+    gap: 28px;
+    padding: 14px 0;
     box-sizing: border-box;
   }
 
-  /* Customize scrollbar for inventory */
-  .inventory-grid::-webkit-scrollbar {
-    width: 6px;
-  }
+  .inventory-grid::-webkit-scrollbar { width: 6px; }
+  .inventory-grid::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 3px; }
+  .inventory-grid::-webkit-scrollbar-thumb { background: #d1a000; border-radius: 3px; }
 
-  .inventory-grid::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 3px;
-  }
-
-  .inventory-grid::-webkit-scrollbar-thumb {
-    background: #d1a000;
-    border-radius: 3px;
-  }
-
-  /* 30% smaller than original 100px = 70px */
   .inventory-item {
     width: 50px !important;
     height: 50px !important;
@@ -133,8 +118,8 @@ import { pages } from '../data/pages.js';
   }
 
   .link-list {
-    flex-grow: 1; /* Allow link list to grow and push footer down */
-    overflow-y: auto; /* Make this section scrollable if needed */
+    flex-grow: 1;
+    overflow-y: auto;
   }
 
   .link-list a {
@@ -143,13 +128,11 @@ import { pages } from '../data/pages.js';
     color: white;
     text-decoration: none;
     border-bottom: 1px solid #444;
-    white-space: normal; /* Allow text to wrap to the next line */
-    word-break: break-word; /* Helps break very long words */
+    white-space: normal;
+    word-break: break-word;
   }
 
-  .link-list a:hover {
-    background-color: #333;
-  }
+  .link-list a:hover { background-color: #333; }
 
   .category {
     padding: 10px;
@@ -161,42 +144,12 @@ import { pages } from '../data/pages.js';
     text-shadow: 0 0 3px rgb(85, 85, 85);
   }
 
-  .link-list a.visited {
-    background-color: #888888;
-    color: #000000;
-    text-decoration: solid;
-  }
-
-  .link-list a.special {
-    background-color: #002382;
-    color: #ffffff;
-    font-weight: bold;
-    text-shadow: 0 0 3px black;
-  }
-
-  .link-list a.special.locked {
-    background-color: #002382;
-    color: #ffffff;
-  }
-
-  .link-list a.special1 {
-    background-color: #7e0082;
-    color: #ffffff;
-    font-weight: bold;
-    text-shadow: 0 0 3px black;
-  }
-
-  .link-list a.special1.locked {
-    background-color: #7e0082;
-    color: #ffffff;
-  }
-
-  .link-list a.locked {
-    background-color: #444;
-    color: #999;
-    position: relative;
-    pointer-events: none;
-  }
+  .link-list a.visited { background-color: #888888; color: #000000; text-decoration: solid; }
+  .link-list a.special { background-color: #002382; color: #ffffff; font-weight: bold; text-shadow: 0 0 3px black; }
+  .link-list a.special.locked { background-color: #002382; color: #ffffff; }
+  .link-list a.special1 { background-color: #7e0082; color: #ffffff; font-weight: bold; text-shadow: 0 0 3px black; }
+  .link-list a.special1.locked { background-color: #7e0082; color: #ffffff; }
+  .link-list a.locked { background-color: #444; color: #999; position: relative; pointer-events: none; }
 
   .link-icon {
     color: #FFD700 !important;
@@ -208,63 +161,17 @@ import { pages } from '../data/pages.js';
     font-weight: bold;
   }
 
-  /* Mobile styles */
   @media (max-width: 768px) {
-    .sidebar {
-      width: 250px;
-      transform: translateX(-100%); /* Hide off-screen by default */
-      z-index: 1002;
-    }
-
-    .sidebar.open {
-      transform: translateX(0); /* Bring into view when open */
-    }
-    
-    /* Maintain proportions on mobile */
-    .inventory-container {
-      height: 160px;
-      min-height: 160px;
-      max-height: 160px;
-    }
-    
-    .inventory-item {
-      width: 45px !important;
-      height: 45px !important;
-      min-width: 45px !important;
-      min-height: 45px !important;
-      max-width: 45px !important;
-      max-height: 45px !important;
-    }
-    
-    .inventory-grid {
-      gap: 24px; /* Smaller gap for mobile */
-    }
+    .sidebar { width: 250px; transform: translateX(-100%); z-index: 1002; }
+    .sidebar.open { transform: translateX(0); }
+    .inventory-container { height: 160px; min-height: 160px; max-height: 160px; }
+    .inventory-item { width: 45px !important; height: 45px !important; min-width: 45px !important; min-height: 45px !important; max-width: 45px !important; max-height: 45px !important; }
+    .inventory-grid { gap: 24px; }
   }
 
-  /* Small mobile styles */
   @media (max-width: 480px) {
-    .sidebar {
-      width: 200px;
-    }
-    
-    /* Maintain proportions on small mobile */
-    .inventory-container {
-      height: 110px;
-      min-height: 110px;
-      max-height: 110px;
-    }
-    
-    .inventory-item {
-      width: 25px !important;
-      height: 25px !important;
-      min-width: 25px !important;
-      min-height: 25px !important;
-      max-width: 25px !important;
-      max-height: 25px !important;
-    }
-    
-    .inventory-grid {
-      gap: 20px; /* Even smaller gap for small mobile */
-    }
+    .sidebar { width: 200px; }
+    .inventory-container { height: 110px; min-height: 110px; max-height: 110px; }
+    .inventory-item { width: 25px !important; height: 25px !important; min-width: 25px !important; min-height: 25px !important; max-width: 25px !important; max-height: 25px !important; }
+    .inventory-grid { gap: 20px; }
   }
-</style>
