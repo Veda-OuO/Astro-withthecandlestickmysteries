@@ -1,56 +1,71 @@
 ---
-// src/pages/contact.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+// filepath: c:\Users\gregw\retrograde-meridian\src\pages\contact.astro
+import LandingLayout from '../layouts/LandingLayout.astro';
+const baseUrl = import.meta.env.BASE_URL;
 ---
 
-<BaseLayout title="Contact" pageId="contact">
-  <style>
-    body {
-      --page-background-image: url('/assets/aflanders.jpg');
-    }
-  </style>
-
-  <div class="title">Contact</div>
+<LandingLayout 
+  title="Contact | With the Candlestick Mysteries"
+  description="Contact the creators of With the Candlestick Mysteries with your feedback, bug reports, or questions."
+  backgroundImage={`${baseUrl}/assets/birdroom.jpg`}
+>
+  <h1>Contact Us</h1>
   
-  <div class="text-box">
-    <p>What did you think of the game? Any recommendations? Catch any typos or bugs? I'd love to hear from you.</p>
-  </div>
+  <div class="content-box">
+    <p class="intro">What did you think of the game? Any recommendations? Catch any typos or bugs? I'd love to hear from you.</p>
   
-  <div class="contact-form-container">
-    <form action="https://formspree.io/f/movldjyq" method="POST">
-      <div class="form-group">
-        <label for="name">Your Name</label>
-        <input type="text" id="name" name="name" required />
-      </div>
+    <div class="contact-form-container">
+      <form action="https://formspree.io/f/movldjyq" method="POST">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" required />
+        </div>
 
-      <div class="form-group">
-        <label for="email">Your Email</label>
-        <input type="email" id="email" name="_replyto" required />
-      </div>
+        <div class="form-group">
+          <label for="email">Your Email</label>
+          <input type="email" id="email" name="_replyto" required />
+        </div>
 
-      <div class="form-group">
-        <label for="message">Message</label>
-        <textarea id="message" name="message" required></textarea>
-      </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
 
-      <!-- Optional: redirect on success -->
-      <input type="hidden" name="_next" value="https://withthecandlestickmysteries.com/thankyou.html" />
+        <!-- Optional: redirect on success -->
+        <input type="hidden" name="_next" value="https://withthecandlestickmysteries.com/thankyou.html" />
 
-      <!-- Optional: honeypot spam trap -->
-      <input type="text" name="_gotcha" style="display:none" />
+        <!-- Optional: honeypot spam trap -->
+        <input type="text" name="_gotcha" style="display:none" />
 
-      <button type="submit" class="contact-button">Send Message</button>
-    </form>
+        <button type="submit" class="contact-button">Send Message</button>
+      </form>
+    </div>
   </div>
-</BaseLayout>
+</LandingLayout>
 
 <style>
-  .title {
-    font-size: 100px;
-    color: rgb(255, 166, 0);
-    text-shadow: 0 0 10px rgb(0, 0, 0);
-    padding: 10px;
-    margin-bottom: 20px;
+  h1 {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #f8f8f8;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  }
+
+  .intro {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    text-align: center important!;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #e0e0e0;
+  }
+
+  .content-box {
+    max-width: 800px;
+    margin: 0 auto;
   }
 
   .contact-form-container {
@@ -102,20 +117,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
     align-self: flex-start;
   }
 
   .contact-button:hover {
     background: #a30000;
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .contact-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
 
-  /* Media queries for responsive design */
   @media (max-width: 768px) {
-    .title {
-      font-size: 40px;
-      margin-top: 50px;
+    h1 {
+      font-size: 2.5rem;
     }
     
     form {
@@ -124,8 +143,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   @media (max-width: 480px) {
-    .title {
-      font-size: 30px;
+    h1 {
+      font-size: 2rem;
     }
     
     .contact-button {

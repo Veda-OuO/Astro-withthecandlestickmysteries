@@ -1,6 +1,7 @@
 ---
 // filepath: c:\Users\gregw\retrograde-meridian\src\components\Sidebar.astro
 import { pages } from '../data/pages.js';
+import { items } from '../data/pages.js';
 const baseUrl = import.meta.env.BASE_URL;
 ---
 
@@ -37,7 +38,7 @@ const baseUrl = import.meta.env.BASE_URL;
   </div>
 </div>
 
-<style define:vars={{ inventoryBg: `${baseUrl}/assets/inventory-bg.jpg` }}>
+<style>
   .sidebar {
     width: 280px;
     background-color: #111;
@@ -71,12 +72,12 @@ const baseUrl = import.meta.env.BASE_URL;
     margin-bottom: 20px;
     border-radius: 8px;
     border: 1px solid #444;
-    background-image: url(var(--inventoryBg));
-    background-size: cover;
-    background-position: center;
-    height: 160px;
-    min-height: 160px;
-    max-height: 160px;
+    background-image: url('/Astro-withthecandlestickmysteries/assets/inventory-bg.jpg');
+    background-size: cover !important;
+    background-position: center !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    max-height: 160px !important;
     width: 100%;
     padding: 10px;
     overflow: hidden;
@@ -175,3 +176,4 @@ const baseUrl = import.meta.env.BASE_URL;
     .inventory-item { width: 25px !important; height: 25px !important; min-width: 25px !important; min-height: 25px !important; max-width: 25px !important; max-height: 25px !important; }
     .inventory-grid { gap: 20px; }
   }
+</style>

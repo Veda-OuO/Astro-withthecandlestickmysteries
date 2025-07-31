@@ -1,19 +1,19 @@
-const baseUrl = import.meta.env.BASE_URL;
+
 
 // A dictionary of all possible inventory items in the game.
 // Each item now has a name for display and a path to its image.
 export const items = {
   closet_key2: { 
     name: "Shattered Dragon Figurine",
-    image: `${baseUrl}/assets/items/key3.jpg` 
+    image: `/Astro-withthecandlestickmysteries/assets/items/key3.jpg` 
   },
   closet_key: {
     name: "Small Iron Key",
-    image: `${baseUrl}/assets/items/key.jpg`
+    image: `/Astro-withthecandlestickmysteries/assets/items/key.jpg`
   },
     closet_key3: {
     name: "Smallss Iron Key",
-    image: `${baseUrl}/assets/items/key3.jpg`
+    image: `/Astro-withthecandlestickmysteries/assets/items/key3.jpg`
   },
   // Add other item IDs and their data here
 };
@@ -45,7 +45,7 @@ export const pages = [
   { type: 'link', filename: '3p', title: '3 - P', counted: false, initialLocked: true },
   { type: 'link', filename: '4p', title: '4 - P', initialLocked: true },
   { type: 'category', title: 'Second Floor' },
-  { type: 'link', filename: 'birdroom', title: 'Bird Room', unlocksOnVisit: ['9p'] }, 
+  { type: 'link', filename: 'birdroom', title: 'Bird Room' }, 
   { type: 'link', filename: 'warroom', title: 'War Room' },
   { type: 'link', filename: 'ivorysuite', title: 'Ivory Suite' },
   { type: 'link', filename: '9p', title: '9 - P', initialLocked: true, unlocksOnVisit: ['9a', '12c', '4a', '10b', '11a']  },

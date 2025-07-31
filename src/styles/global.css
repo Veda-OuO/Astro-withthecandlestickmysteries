@@ -36,6 +36,11 @@ p {
   max-width: 85%;
 }
 
+.case-title {
+  font-family: 'Special Elite', cursive; /* or any font you prefer */
+  font-size: 1.2rem;
+  font-weight: bold;
+}
 /* Game Page Banner */
 .banner {
   width: 100%;
