@@ -5,15 +5,15 @@
 export const items = {
   closet_key2: { 
     name: "Shattered Dragon Figurine",
-    image: `/Astro-withthecandlestickmysteries/assets/items/key3.jpg` 
+    image: `/assets/items/key3.jpg` 
   },
   closet_key: {
     name: "Small Iron Key",
-    image: `/Astro-withthecandlestickmysteries/assets/items/key.jpg`
+    image: `/assets/items/key.jpg`
   },
     closet_key3: {
     name: "Smallss Iron Key",
-    image: `/Astro-withthecandlestickmysteries/assets/items/key3.jpg`
+    image: `/assets/items/key3.jpg`
   },
   // Add other item IDs and their data here
 };
