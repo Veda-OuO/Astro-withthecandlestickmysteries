@@ -31,7 +31,7 @@ const baseUrl = import.meta.env.BASE_URL;
   </div>
   
   <div class="bottom-image">
-    <img src={`${baseUrl}/assets/PointsComparisonChart-WW.png`} alt="Points comparison chart" class="bottom-image-style">
+    <img src={`/assets/PointsComparisonChart-WW.png`} alt="Points comparison chart" class="bottom-image-style">
   </div>
   
   <div class="rules-action-buttons">
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     resetCaseButton.addEventListener('click', () => {
       if (confirm('Are you sure you want to reset this case? All your progress will be lost.')) {
         localStorage.clear();
-        window.location.href = `${baseUrl}/intro`;
+        window.location.href = `/intro`;
       }
     });
   }

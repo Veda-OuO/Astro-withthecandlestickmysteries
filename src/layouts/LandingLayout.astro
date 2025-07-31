@@ -7,7 +7,7 @@ export interface Props {
 }
 
 const baseUrl = import.meta.env.BASE_URL;
-const { title, description, backgroundImage = `${baseUrl}/assets/landing-bg.jpg` } = Astro.props;
+const { title, description, backgroundImage = `/assets/landing-bg.jpg` } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -20,7 +20,7 @@ const { title, description, backgroundImage = `${baseUrl}/assets/landing-bg.jpg`
   
   
    <!-- Favicon -->
-  <link rel="icon" href={`${baseUrl}/favicon.ico`}>
+  <link rel="icon" href={`/favicon.ico`}>
   
   <title>{title}</title>
   
@@ -35,7 +35,7 @@ const { title, description, backgroundImage = `${baseUrl}/assets/landing-bg.jpg`
     <nav>
       <a href={baseUrl || '/'} class="logo">With the Candlestick</a>
       <div class="nav-links">
-        <a href={`${baseUrl}/contact`}>Contact</a>
+        <a href={`/contact`}>Contact</a>
       </div>
       <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
         <span class="hamburger"></span>
